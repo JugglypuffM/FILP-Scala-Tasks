@@ -1,0 +1,30 @@
+name: autoupdate
+on:
+  schedule:
+    - cron: '0 16 * * *'
+  workflow_dispatch:
+
+jobs:
+  autoupdate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+
+      - name: actions-template-sync
+        uses: AndreasAugustin/actions-template-sync@v1.5.0
+        with:
+          github_token: ${{ secrets.GH_TOKEN }}
+          source_repo_path: filp-2024/exercises
+          upstream_branch: main
+          pr_labels: automerge
+          pr_title: 'Обновление репозитория студента из репозитория с домашними работами'
+          pr_commit_msg: 'Обновление репозитория студента из репозитория с домашними работами'
+          pr_branch_name_prefix: sync_repo
