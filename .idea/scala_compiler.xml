@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ScalaCompilerConfiguration">
+    <profile name="sbt 1" modules="stanislav_klinin_jugglypuffm_3192" />
+    <profile name="sbt 2" modules="exercises01">
+      <parameters>
+        <parameter value="-Yrangepos" />
+        <parameter value="-P:semanticdb:targetroot:/home/jugglylinux/things/IntelliJ/Stanislav_Klinin_JugglypuffM/exercises01/target/scala-2.13/meta" />
+      </parameters>
+      <plugins>
+        <plugin path="$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scalameta/semanticdb-scalac_2.13.12/4.8.10/semanticdb-scalac_2.13.12-4.8.10.jar" />
+      </plugins>
+    </profile>
+    <profile name="sbt 3" modules="exercises">
+      <parameters>
+        <parameter value="-Yrangepos" />
+        <parameter value="-P:semanticdb:targetroot:/home/jugglylinux/things/IntelliJ/Stanislav_Klinin_JugglypuffM/target/scala-2.13/meta" />
+      </parameters>
+      <plugins>
+        <plugin path="$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scalameta/semanticdb-scalac_2.13.12/4.8.10/semanticdb-scalac_2.13.12-4.8.10.jar" />
+      </plugins>
+    </profile>
+  </component>
+</project>
