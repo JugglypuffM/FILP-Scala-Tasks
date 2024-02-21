@@ -18,5 +18,11 @@ jobs:
       - name: Coursier cache
         uses: coursier/cache-action@v6
 
-      - name: Compile and test
-        run: sbt test
+      - name: Compile and test exercises01
+        if: github.event.pull_request.head.ref == 'exercises01'
+        run: sbt "project exercises01" clean compile test
+
+      - name: Compile and test exercises02
+        if: github.event.pull_request.head.ref == 'exercises02'
+        run: sbt "project exercises02" clean compile test
+

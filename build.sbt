@@ -19,6 +19,11 @@ val libraries = Seq(
   "org.scalatestplus" %% "scalacheck-1-15" % "3.3.0.0-SNAP3" % Test
 )
 
+// exercises
 lazy val exercises01 = project in file("exercises01") settings (libraryDependencies ++= libraries)
+lazy val exercises02 = project in file("exercises02") settings (libraryDependencies ++= libraries)
+
+// lectures
+lazy val lecture02 = project in file("lecture02") settings (libraryDependencies ++= libraries)
 
 val kindProjectorDep = "org.typelevel" % "kind-projector" % "0.13.2" cross CrossVersion.full
