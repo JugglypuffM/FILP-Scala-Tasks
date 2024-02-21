@@ -11,9 +11,7 @@ class Vector(val x: Double, val y: Double) {
 
   def euclideanLength: Double = math.sqrt(x*x + y*y)
 
-  def normalized: Vector = {
-    new Vector(x, y)*(1/euclideanLength)
-  }
+  def normalized: Vector = this*(1/euclideanLength)
 
   override def equals(other: Any): Boolean = {
     other match {
