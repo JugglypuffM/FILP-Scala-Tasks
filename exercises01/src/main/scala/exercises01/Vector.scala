@@ -12,8 +12,7 @@ class Vector(val x: Double, val y: Double) {
   def euclideanLength: Double = math.sqrt(x*x + y*y)
 
   def normalized: Vector = {
-    val el = euclideanLength
-    new Vector(x / el, y / el)
+    new Vector(x, y)*(1/euclideanLength)
   }
 
   override def equals(other: Any): Boolean = {
@@ -30,7 +29,7 @@ class Vector(val x: Double, val y: Double) {
 object Vector {
   def fromAngle(angle: Double, length: Double): Vector = new Vector(math.cos(angle)*length, math.sin(angle)*length)
 
-  def sum(list: List[Vector]): Vector = list.foldLeft(new Vector(0, 0))((x, y) => x + y)
+  def sum(list: List[Vector]): Vector = list.foldLeft(new Vector(0, 0))(_+_)
 
   def unapply(arg: Vector): Option[(Double, Double)] = Some(arg.x, arg.y)
 }
