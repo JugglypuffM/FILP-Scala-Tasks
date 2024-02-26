@@ -1,12 +1,14 @@
 package exercises02
 
+import scala.util.matching.Regex
+
 object Counter {
-  private val wordSeparators = "[\\s.,!?:\\n\\t\\r()]"
-  private val intSeparators = "[\\s!?:\\n\\t\\r]"
+  private val wordSeparatorsRegex = raw"(.*?)[\s.,!?:\n\t\r()]".r
+  private val intSeparatorsRegex = raw"(.*?)[\s!?:\n\t\r]".r
   private val wordRegex = raw"[\w-']+".r
   private val intRegex = raw"[\d.,]+".r
-  def count(text:String, separators: String, filter: String => Boolean): Map[String, Int] = text
-    .split(separators)
+  def count(text:String, separatorsRegex: Regex, filter: String => Boolean): Map[String, Int] =
+    (for (m <- separatorsRegex.findAllMatchIn(text)) yield m.group(1)).toList
     .filter(filter)
     .groupBy(_.toLowerCase)
     .view
@@ -17,14 +19,14 @@ object Counter {
     * слово отделено символами [\s.,!?:\n\t\r]
     */
   def countWords(text: String): Map[String, Int] =
-    count(text, wordSeparators, _.nonEmpty)
+    count(text+" ", wordSeparatorsRegex, _.nonEmpty)
 
   /**
     * Посчитать количество вхождений английских слов в тексте
     * слово отделено символами [\s.,!?:\n\t\r]
     */
   def countEnglishWords(text: String): Map[String, Int] =
-    count(text, wordSeparators, word => wordRegex.pattern.matcher(word).matches)
+    count(text+" ", wordSeparatorsRegex, wordRegex.pattern.matcher(_).matches)
 
 
   /**
@@ -32,6 +34,6 @@ object Counter {
     * число отделено символами [\s!?:\n\t\r]
     */
   def countNumbers(text: String): Map[String, Int] =
-    count(text, intSeparators, word => intRegex.pattern.matcher(word).matches)
+    count(text+" ", intSeparatorsRegex, intRegex.pattern.matcher(_).matches)
 
 }

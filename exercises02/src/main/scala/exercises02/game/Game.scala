@@ -5,7 +5,7 @@ import scala.annotation.tailrec
 class Game(controller: GameController) {
   private object Nextline{
     def unapply(line: String): Option[Int] = {
-      try{Some(line.toInt)}
+      try{line.toIntOption}
       catch {case _: Exception => None}
     }
   }
@@ -27,10 +27,10 @@ class Game(controller: GameController) {
   final def play(number: Int): Unit = {
     controller.askNumber()
     controller.nextLine() match {
-      case Nextline(value) if value == number => controller.guessed();
+      case Nextline(value) if value == number => controller.guessed()
       case Nextline(value) if value > number => controller.numberIsSmaller(); play(number)
       case Nextline(value) if value < number => controller.numberIsBigger(); play(number)
-      case GameController.IGiveUp => controller.giveUp(number);
+      case GameController.IGiveUp => controller.giveUp(number)
       case _ => controller.wrongInput(); play(number)
     }
   }
