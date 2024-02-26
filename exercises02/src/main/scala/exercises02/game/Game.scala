@@ -1,7 +1,14 @@
 package exercises02.game
 
-class Game(controller: GameController) {
+import scala.annotation.tailrec
 
+class Game(controller: GameController) {
+  private object Nextline{
+    def unapply(line: String): Option[Int] = {
+      try{Some(line.toInt)}
+      catch {case _: Exception => None}
+    }
+  }
   /**
     * Игра угадай число
     * Ввод и вывод необходимо осуществлять с помощью методов controller
@@ -16,22 +23,15 @@ class Game(controller: GameController) {
     *
     * @param number загаданное число
     */
-  def play(number: Int): Unit = {
-    while (true){
-      controller.askNumber()
-      val line = controller.nextLine()
-      if (line.equals(GameController.IGiveUp)) {controller.giveUp(number); return }
-      else {
-        try{
-          val suggestion = line.toInt
-          if (suggestion.equals(number)) {controller.guessed(); return}
-          else if (suggestion < number) controller.numberIsBigger()
-          else controller.numberIsSmaller()
-        }
-        catch {
-          case _: Exception => controller.wrongInput()
-        }
-      }
+  @tailrec
+  final def play(number: Int): Unit = {
+    controller.askNumber()
+    controller.nextLine() match {
+      case Nextline(value) if value == number => controller.guessed();
+      case Nextline(value) if value > number => controller.numberIsSmaller(); play(number)
+      case Nextline(value) if value < number => controller.numberIsBigger(); play(number)
+      case GameController.IGiveUp => controller.giveUp(number);
+      case _ => controller.wrongInput(); play(number)
     }
   }
 }
