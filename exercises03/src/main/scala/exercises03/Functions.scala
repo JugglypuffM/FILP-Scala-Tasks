@@ -13,10 +13,12 @@ class Functions {
 
   def liftOption[A, B](f: A => B): A => Option[B] = A => Option(f(A))
 
-  def chain[A](functions: List[A => A]): A => Option[A] = A => functions match {
-    case List() => None
-    case _ => functions.foldLeft(Option(A))((res, func) => res.flatMap(value => Some(func(value))))
-  }
+  def chain[A](functions: List[A => A]): A => Option[A] =
+    A =>
+      functions match {
+        case List() => None
+        case _      => functions.foldLeft(Option(A))((res, func) => res.flatMap(value => Some(func(value))))
+      }
 
   def zip[A, B, C](f: A => B, g: A => C): A => (B, C) = A => (f(A), g(A))
 
