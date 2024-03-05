@@ -38,18 +38,18 @@ object MyList {
     inner(myList, None)
   }
 
-  def size[A](myList: MyList[A]): Int = foldLeft(myList)(0)((B, A) => B + 1)
+  def size[A](myList: MyList[A]): Int = foldLeft(myList)(0)((B, _) => B + 1)
 
   def max[A](myList: MyList[A], isBigger: (A, A) => Boolean): Option[A] = {
     @tailrec
     def inner(list: MyList[A], acc: Option[A]): Option[A] = list match {
       case Cons(head, tail) =>
         val tmp = acc match {
-                case Some(v) => if (isBigger(v, head)) Some(v) else Some(head)
-                case None    => Some(head)
-              }
+          case Some(v) => if (isBigger(v, head)) Some(v) else Some(head)
+          case None    => Some(head)
+        }
         inner(tail, tmp)
-      case Nil              => acc
+      case Nil => acc
     }
     inner(myList, None)
   }
@@ -62,7 +62,7 @@ object MyList {
           case Preserve => inner(tail, Cons(head, acc))
           case Skip     => inner(tail, acc)
         }
-      case Nil              => acc
+      case Nil => acc
     }
     reverse(inner(myList, Nil))
   }
