@@ -12,10 +12,8 @@ object Example10FunctionTypeBounds extends App {
   //  |
   // Baz
 
-
   def function1[T <: Bar](x: T): T = x
   def function2[T >: Bar](x: T): T = x
-
 
 //  val x11: Foo = function1(new Foo {}) // won't compile
   val x12: Bar = function1(new Bar)

@@ -1,3 +1,3 @@
 package another.pakage
 
-class Data (a: Int, b: Int)
+class Data(a: Int, b: Int)

@@ -15,8 +15,6 @@ object Example07CallByValueOrName extends App {
   callByValue(System.nanoTime())
   callByName(System.nanoTime())
 
-
-
   def callByValue2(f: Unit): Unit = {
     f
     f

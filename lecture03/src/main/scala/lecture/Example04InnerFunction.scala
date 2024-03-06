@@ -9,10 +9,7 @@ object Example04InnerFunction extends App {
     if (n <= 1) acc
     else factorialTailRec(acc * n, n - 1)
 
-
   println(factorialTailRec(10, 1))
-
-
 
   def factorialTailRecInner(n: Int): Int = {
     @tailrec
@@ -22,8 +19,6 @@ object Example04InnerFunction extends App {
     }
     f(n, 1)
   }
-
-
 //  println(factorialTailRec(10, 1))
 //  println(factorialTailRecInner(10))
 }

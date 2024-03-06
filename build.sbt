@@ -23,9 +23,11 @@ val libraries = Seq(
 lazy val exercises01 = project in file("exercises01") settings (libraryDependencies ++= libraries)
 lazy val exercises02 = project in file("exercises02") settings (libraryDependencies ++= libraries)
 lazy val exercises03 = project in file("exercises03") settings (libraryDependencies ++= libraries)
+lazy val exercises04 = project in file("exercises04") settings (libraryDependencies ++= libraries)
 
 // lectures
 lazy val lecture02 = project in file("lecture02") settings (libraryDependencies ++= libraries)
 lazy val lecture03 = project in file("lecture03") settings (libraryDependencies ++= libraries)
+lazy val lecture04 = project in file("lecture04") settings (libraryDependencies ++= libraries)
 
 val kindProjectorDep = "org.typelevel" % "kind-projector" % "0.13.2" cross CrossVersion.full
