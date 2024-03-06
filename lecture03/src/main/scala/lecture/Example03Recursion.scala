@@ -16,7 +16,6 @@ object Example03Recursion extends App {
 
   println(factorial(10))
 
-
   def factorialRec(n: BigInt): BigInt =
     if (n <= 1) 1
     else n * factorialRec(n - 1)
@@ -31,9 +30,7 @@ object Example03Recursion extends App {
     3 * (2 * 1)
     3 * 2
     6
-  */
-
-
+   */
   @tailrec
   def factorialTailRec(accumulator: BigInt, n: BigInt): BigInt =
     if (n <= 1) accumulator
@@ -48,5 +45,5 @@ object Example03Recursion extends App {
     factorialTailRec(1 * 5 * 4 * 3, 2))
     factorialTailRec(1 * 5 * 4 * 3 * 2, 1))
     120
-   */
+ */
 }
