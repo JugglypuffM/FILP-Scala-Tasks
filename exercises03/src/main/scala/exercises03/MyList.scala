@@ -21,26 +21,26 @@ object MyList {
 
   def sum(list: MyList[Int]): Int = foldLeft(list)(0)(_ + _)
 
-  def reverse[A](list: MyList[A]): MyList[A] = foldLeft(list)(Nil: MyList[A])((B, A) => Cons(A, B))
+  def reverse[A](list: MyList[A]): MyList[A] = foldLeft(list)(Nil: MyList[A])((prev, next) => Cons(next, prev))
 
-  def last[A](myList: MyList[A]): Option[A] = foldLeft(myList)(None: Option[A])((B, A) => Some(A))
+  def last[A](myList: MyList[A]): Option[A] = foldLeft(myList)(None: Option[A])((prev, next) => Some(next))
 
-  def size[A](myList: MyList[A]): Int = foldLeft(myList)(0)((B, A) => B + 1)
+  def size[A](myList: MyList[A]): Int = foldLeft(myList)(0)((prev, next) => prev + 1)
 
   def max[A](myList: MyList[A], isBigger: (A, A) => Boolean): Option[A] =
-    foldLeft(myList)(None: Option[A])((A1, A2) =>
-      A1 match {
-        case Some(v) => if (isBigger(v, A2)) Some(v) else Some(A2)
-        case None    => Some(A2)
+    foldLeft(myList)(None: Option[A])((prev, next) =>
+      prev match {
+        case Some(v) => if (isBigger(v, next)) Some(v) else Some(next)
+        case None    => Some(next)
       }
     )
 
   def filter[A](myList: MyList[A], predicate: A => Filter.Filter): MyList[A] =
     reverse(
-      foldLeft(myList)(Nil: MyList[A])((B, A) =>
-        predicate(A) match {
-          case Preserve => Cons(A, B)
-          case Skip     => B
+      foldLeft(myList)(Nil: MyList[A])((prev, next) =>
+        predicate(next) match {
+          case Preserve => Cons(next, prev)
+          case Skip     => prev
         }
       )
     )
