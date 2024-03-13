@@ -2,13 +2,13 @@ package lecture
 
 object Example13AnonymousFunction extends App {
 
-  val doubler = new Function[Int, Int] {
+  val doubler: Function[Int,Int] = new Function[Int, Int] {
     override def apply(x: Int): Int = x * 2
   }
 
   // anonymous function or lambda
 
-  val doubler2 = (x: Int) => x * 2
+  val doubler2: Int => Int = (x: Int) => x * 2
 
   val doubler3: Int => Int = (x: Int) => x * 2
 
@@ -16,16 +16,16 @@ object Example13AnonymousFunction extends App {
 
   val doubler5: Int => Int = _ * 2
 
-  val adder = (a: Int, b: Int) => a + b
+  val adder: (Int, Int) => Int = (a: Int, b: Int) => a + b
 
   val adder2: (Int, Int) => Int = _ + _
 
-  val noParams = () => 2
+  val noParams: () => Int = () => 2
 
   println(noParams)
   println(noParams())
 
-  val curlyBraces = { (x: Int) =>
+  val curlyBraces: Int => String = { (x: Int) =>
     x.toString
   }
 }

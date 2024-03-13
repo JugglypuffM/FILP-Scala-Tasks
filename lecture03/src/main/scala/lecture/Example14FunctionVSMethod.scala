@@ -14,18 +14,18 @@ object Example14FunctionVSMethod extends App {
 
   function(5)
 
-  val f1 = function
+  val f1: Int => String = function
 //  val f2 = method
 
   println(function)
 //  println(method)
 
-  val functions = List(function)
+  val functions: List[Int => String] = List(function)
 //  val methods = List(method)
 
-  val f3 = method _ // eta-expansion
+  val f3: Int => String = method _ // eta-expansion
 
-  val f4 = (arg: Int) => method(arg)
+  val f4: Int => String = (arg: Int) => method(arg)
 
   val f5: Int => String = method
 

@@ -22,8 +22,8 @@ object Example03 extends App {
 
   case class Cat(id: Long, name: String, color: Color) extends Pet
 
-  val dog = Dog(1, "Doggie")
-  val cat = Cat(2, "Cattie", Color.Black)
+  val dog: Dog = Dog(1, "Doggie")
+  val cat: Cat = Cat(2, "Cattie", Color.Black)
 
   // Exhaustive pattern matching
   def color(pet: Pet): Color =
@@ -33,7 +33,7 @@ object Example03 extends App {
     }
 
   // Определенный компилятором метод copy
-  val whiteCat = cat.copy(id = 3, color = Color.White)
+  val whiteCat: Cat = cat.copy(id = 3, color = Color.White)
 
   println(color(dog)) // Red
 

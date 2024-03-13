@@ -1,7 +1,7 @@
 package consacols
 
 object Example15Folds extends App {
-  val list = List(1, 2, 3, 4, 5, 6, 7)
+  val list: List[Int] = List(1, 2, 3, 4, 5, 6, 7)
   //fold
   list.fold(0)(_ + _) // i.e. sum
   list.fold(1)(_ * _) // i.e. *

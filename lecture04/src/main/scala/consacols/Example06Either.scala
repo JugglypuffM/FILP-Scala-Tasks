@@ -8,10 +8,10 @@ object Example06Either extends App {
     case Left(message) => println(s"nothing but $message")
   }
 
-  val valueWithFallbackBad = if (eitherValue.isLeft) eitherValue.left.get else 0
+  val valueWithFallbackBad: Any = if (eitherValue.isLeft) eitherValue.left.get else 0
 
-  val transformValue    = eitherValue.map(_ * 3)
-  val valueWithFallback = eitherValue.fold(_ => 0, identity)
+  val transformValue: Either[String, Int] = eitherValue.map(_ * 3)
+  val valueWithFallback: Int              = eitherValue.fold(_ => 0, identity)
 
   eitherValue.foreach(println)
 
@@ -21,8 +21,8 @@ object Example06Either extends App {
 
   val i: Either[String, Int] = Right(2)
 
-  val result1 = i.flatMap(v => f1(v).flatMap(vv => fn(vv)))
-  val result2 = for {
+  val result1: Either[String, Int] = i.flatMap(v => f1(v).flatMap(vv => fn(vv)))
+  val result2: Either[String, Int] = for {
     r0 <- i
     r1 <- f1(r0)
     // ....

@@ -11,7 +11,7 @@ object Example02PureFunctions {
   }
   // Answer - YES
 
-  var number2 = 5
+  var number2: Int = 5
 
   def func2(foo: String, bar: Int): String = {
     number2 = 6
@@ -19,7 +19,7 @@ object Example02PureFunctions {
   }
   // Answer - NO
 
-  var number3 = 5
+  var number3: Int = 5
 
   def func3(foo: String, bar: Int): String = {
     foo + bar + number3
@@ -32,7 +32,7 @@ object Example02PureFunctions {
   }
   // Answer - YES
 
-  val number5 = 5
+  val number5: Int = 5
 
   def func5(foo: String, bar: Int): String = {
     foo + bar + number5

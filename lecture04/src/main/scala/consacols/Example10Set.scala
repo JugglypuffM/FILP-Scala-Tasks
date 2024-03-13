@@ -4,20 +4,20 @@ import scala.collection.mutable
 
 object Example10Set extends App {
   // construct
-  val setIM =
+  val setIM: Set[String] =
     Set("one", "two", "three", "one1", "two2", "three3")
 
   //access
-  val elemIM = setIM("one") // set is like function
+  val elemIM: Boolean = setIM("one") // set is like function
 
   //updates
-  val setIM1 = setIM + "four"
-  val setIM2 = setIM - "one"
+  val setIM1: Set[String] = setIM + "four"
+  val setIM2: Set[String] = setIM - "one"
 
-  val setM = mutable.Set("one", "two", "three")
+  val setM: mutable.Set[String] = mutable.Set("one", "two", "three")
 
   //access
-  val elem = setM("one") // set is like function
+  val elem: Boolean = setM("one") // set is like function
 
   //updates in place
   setM += "four"
