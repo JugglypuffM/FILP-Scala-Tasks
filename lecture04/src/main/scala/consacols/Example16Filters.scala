@@ -1,7 +1,7 @@
 package consacols
 
 object Example16Filters extends App {
-  val map = Map("one" -> 1, "two" -> 2, "three" -> 3, "four" -> 4)
+  val map: Map[String, Int] = Map("one" -> 1, "two" -> 2, "three" -> 3, "four" -> 4)
   // for all traversables
   println(
     map.filter { case (k, v) => v >= 3 }

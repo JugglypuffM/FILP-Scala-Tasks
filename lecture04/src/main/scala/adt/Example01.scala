@@ -9,11 +9,11 @@ object Example01 extends App {
 
   case class Cat(id: Long, name: String, color: String) extends Pet
 
-  val dog = Dog(1, "Doggie")
-  val cat = Cat(2, "Cattie", "Black")
+  val dog: Dog = Dog(1, "Doggie")
+  val cat: Cat = Cat(2, "Cattie", "Black")
 
-  val dog2 = Dog(1, "Doggie")
-  val cat2 = Cat.apply(2, "Cattie", "Black")
+  val dog2: Dog = Dog(1, "Doggie")
+  val cat2: Cat = Cat.apply(2, "Cattie", "Black")
 
   println(dog.name) // 1
 

@@ -17,33 +17,33 @@ object Example08List extends App {
     override def tail: LList[A]        = next
   }
 
-  val llist = Cons(1, Cons(2, NNil))
+  val llist: Cons[Int] = Cons(1, Cons(2, NNil))
 
   // construct
-  val list1 = List(1, 2, 3, 4, 5)
-  val list2 = 1 :: 2 :: 3 :: Nil
-  val list3 = List.tabulate(10)(n => n * 2)
+  val list1: List[Int] = List(1, 2, 3, 4, 5)
+  val list2: List[Int] = 1 :: 2 :: 3 :: Nil
+  val list3: List[Int] = List.tabulate(10)(n => n * 2)
   println(list3)
   println("tab")
 
-  val list5 = (1 to 10).toList
+  val list5: List[Int] = (1 to 10).toList
   println(list5)
   println(list1)
 
   //access
-  val head    = list1.head // not good
-  val tail    = list1.tail // also not good
-  val headOpt = list1.headOption
+  val head: Int            = list1.head // not good
+  val tail: List[Int]      = list1.tail // also not good
+  val headOpt: Option[Int] = list1.headOption
 
   // with pattern matching
-  val rmatch = list2 match {
+  val rmatch: String = list2 match {
     case head :: f :: s :: Nil => s"$f $s"
     case h :: t                => s"$h and $t"
     case Nil                   => "this is the end"
   }
 
-  val elem  = list1(1)
-  val list4 = 0 :: list2
+  val elem: Int        = list1(1)
+  val list4: List[Int] = 0 :: list2
 
   println(rmatch)
 }

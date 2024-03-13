@@ -27,7 +27,7 @@ object Example02 extends App {
       Some((dog.id, dog.name))
   }
 
-  val dog = Dog(1, "Doggie")
+  val dog: Dog = Dog(1, "Doggie")
 
   println(dog.name) // Doggie
 

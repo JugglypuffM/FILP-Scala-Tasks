@@ -30,7 +30,7 @@ object Example17PartialFunction extends App {
 //  println(f(3))
 
   //partial by hand
-  val evenByHand = new PartialFunction[Int, Int] {
+  val evenByHand: PartialFunction[Int,Int] = new PartialFunction[Int, Int] {
     override def isDefinedAt(x: Int): Boolean = x % 2 == 0
     override def apply(arg: Int): Int = arg match {
       case x if x % 2 == 0 => x / 2
@@ -40,7 +40,7 @@ object Example17PartialFunction extends App {
 //  println(evenByHand(2))
 //  println(evenByHand(3))
 
-  val aMappedList = List(1, 2, 3).map {
+  val aMappedList: List[String] = List(1, 2, 3).map {
     case 1 => "A"
     case 2 => "B"
     case 3 => "C"
@@ -48,13 +48,13 @@ object Example17PartialFunction extends App {
 
 //  println(aMappedList)
 
-  val collectedList = List(1, 2, 3, 4).collect {
+  val collectedList: List[String] = List(1, 2, 3, 4).collect {
     case x if x % 2 == 0 => s"even - $x"
   }
 
 //  println(collectedList)
 
-  val collectedList2 = List(1, "two", 3, "four").collect {
+  val collectedList2: List[String] = List(1, "two", 3, "four").collect {
     case x: String => x * 2
   }
 

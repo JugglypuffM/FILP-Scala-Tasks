@@ -14,7 +14,7 @@ object Def extends App {
     foo + bar + value
   }
 
-  val number = 10
+  val number: Int = 10
 
   def func4(foo: String, bar: Int): String =
     foo + bar + number
