@@ -3,11 +3,15 @@ package exercises04.parser
 import exercises04.either.EitherCombinators._
 import Error._
 
-import scala.Some
-
 object Examples {
-  private val splitRegex    = " ".r
-  private val passportRegex = raw"\d{4} \d{6}".r
+  private val passportRegex = raw"(\d{4}) (\d{6})".r
+
+  private def getUserName(rawUser: RawUser): UserName = (rawUser.firstName, rawUser.secondName) match {
+    case (Some(first), Some(second)) => UserName(first, second, rawUser.thirdName)
+  }
+  private def getPassport(rawUser: RawUser): Passport = rawUser.passport match {
+    case passportRegex(s, n) => Passport(s.toLong, n.toLong)
+  }
 
   /**
     * если rawUser.firstName или rawUser.secondName == None, то функция должна вернуть None
@@ -26,11 +30,7 @@ object Examples {
         case Some(_) => Some()
         case None    => None
       }
-    } yield User(
-      rawUser.id.toLong,
-      UserName(rawUser.firstName.get, rawUser.secondName.get, rawUser.thirdName),
-      Passport(splitRegex.split(rawUser.passport)(0).toLong, splitRegex.split(rawUser.passport)(1).toLong)
-    )
+    } yield User(rawUser.id.toLong, getUserName(rawUser), getPassport(rawUser))
 
   /**
     * если rawUser.firstName или rawUser.secondName == None, то функция должна вернуть Left(InvalidName)
@@ -58,9 +58,5 @@ object Examples {
       }
       _ <- if (rawUser.firstName.isDefined && rawUser.secondName.isDefined) Right() else Left(InvalidName)
       _ <- if (passportRegex.matches(rawUser.passport)) Right() else Left(InvalidPassport)
-    } yield User(
-      rawUser.id.toLong,
-      UserName(rawUser.firstName.get, rawUser.secondName.get, rawUser.thirdName),
-      Passport(splitRegex.split(rawUser.passport)(0).toLong, splitRegex.split(rawUser.passport)(1).toLong)
-    )
+    } yield User(rawUser.id.toLong, getUserName(rawUser), getPassport(rawUser))
 }

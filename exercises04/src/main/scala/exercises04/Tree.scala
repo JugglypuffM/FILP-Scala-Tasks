@@ -13,12 +13,9 @@ object Tree {
     case Branch(left, right) => g(fold(left)(f)(g), fold(right)(f)(g))
   }
 
-  def size[A](t: Tree[A]): Int = t match {
-    case Leaf(value) => 1
-    case _           => fold(t)(_ => 1)(_ + _) + 1
-  }
+  def size[A](t: Tree[A]): Int = fold(t)(_ => 1)(_ + _ + 1)
 
-  def max(t: Tree[Int]): Int = fold(t)(identity)((left, right) => if (left > right) left else right)
+  def max(t: Tree[Int]): Int = fold(t)(identity)((left, right) => math.max(left, right))
 
   def depth[A](t: Tree[A]): Int = fold(t)(_ => 1)((left, _) => left + 1)
 
