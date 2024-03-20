@@ -8,14 +8,15 @@ object Examples {
 
   private def getUserName(rawUser: RawUser): Option[UserName] =
     for {
-      firstName <- rawUser.firstName
+      firstName  <- rawUser.firstName
       secondName <- rawUser.secondName
     } yield UserName(firstName, secondName, rawUser.thirdName)
   private def getPassport(rawUser: RawUser): Option[Passport] = rawUser.passport match {
-    case passportRegex(s, n) => for {
-      series <- s.toLongOption
-      number <- n.toLongOption
-    }yield Passport(series, number)
+    case passportRegex(s, n) =>
+      for {
+        series <- s.toLongOption
+        number <- n.toLongOption
+      } yield Passport(series, number)
     case _ => None
   }
 
@@ -31,8 +32,8 @@ object Examples {
     for {
       username <- getUserName(rawUser)
       passport <- getPassport(rawUser)
-      id <- rawUser.id.toLongOption
-      _ <- if (rawUser.banned == "false") Some() else None
+      id       <- rawUser.id.toLongOption
+      _        <- if (rawUser.banned == "false") Some() else None
     } yield User(id, username, passport)
 
   /**
@@ -55,7 +56,7 @@ object Examples {
       _ <- if (rawUser.banned == "false") Right()
       else if (rawUser.banned == "true") Left(Banned)
       else Left(InvalidBanned)
-      id <- Either.fromOption(rawUser.id.toLongOption)(InvalidId)
+      id       <- Either.fromOption(rawUser.id.toLongOption)(InvalidId)
       username <- Either.fromOption(getUserName(rawUser))(InvalidName)
       passport <- Either.fromOption(getPassport(rawUser))(InvalidPassport)
     } yield User(id, username, passport)
