@@ -17,7 +17,7 @@ object Tree {
 
   def max(t: Tree[Int]): Int = fold(t)(identity)((left, right) => math.max(left, right))
 
-  def depth[A](t: Tree[A]): Int = fold(t)(_ => 1)((left, _) => left + 1)
+  def depth[A](t: Tree[A]): Int = fold(t)(_ => 1)(_ max _ + 1)
 
   // тут может пригодиться явное указание типа
   def map[A, B](t: Tree[A])(f: A => B): Tree[B] = t match {

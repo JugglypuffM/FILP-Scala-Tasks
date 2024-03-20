@@ -6,11 +6,17 @@ import Error._
 object Examples {
   private val passportRegex = raw"(\d{4}) (\d{6})".r
 
-  private def getUserName(rawUser: RawUser): UserName = (rawUser.firstName, rawUser.secondName) match {
-    case (Some(first), Some(second)) => UserName(first, second, rawUser.thirdName)
-  }
-  private def getPassport(rawUser: RawUser): Passport = rawUser.passport match {
-    case passportRegex(s, n) => Passport(s.toLong, n.toLong)
+  private def getUserName(rawUser: RawUser): Option[UserName] =
+    for {
+      firstName <- rawUser.firstName
+      secondName <- rawUser.secondName
+    } yield UserName(firstName, secondName, rawUser.thirdName)
+  private def getPassport(rawUser: RawUser): Option[Passport] = rawUser.passport match {
+    case passportRegex(s, n) => for {
+      series <- s.toLongOption
+      number <- n.toLongOption
+    }yield Passport(series, number)
+    case _ => None
   }
 
   /**
@@ -23,14 +29,11 @@ object Examples {
     */
   def transformToOption(rawUser: RawUser): Option[User] =
     for {
-      _ <- if (rawUser.firstName.isDefined && rawUser.secondName.isDefined) Some() else None
-      _ <- if (passportRegex.matches(rawUser.passport)) Some() else None
+      username <- getUserName(rawUser)
+      passport <- getPassport(rawUser)
+      id <- rawUser.id.toLongOption
       _ <- if (rawUser.banned == "false") Some() else None
-      _ <- rawUser.id.toLongOption match {
-        case Some(_) => Some()
-        case None    => None
-      }
-    } yield User(rawUser.id.toLong, getUserName(rawUser), getPassport(rawUser))
+    } yield User(id, username, passport)
 
   /**
     * если rawUser.firstName или rawUser.secondName == None, то функция должна вернуть Left(InvalidName)
@@ -52,11 +55,8 @@ object Examples {
       _ <- if (rawUser.banned == "false") Right()
       else if (rawUser.banned == "true") Left(Banned)
       else Left(InvalidBanned)
-      _ <- rawUser.id.toLongOption match {
-        case Some(_) => Right()
-        case None    => Left(InvalidId)
-      }
-      _ <- if (rawUser.firstName.isDefined && rawUser.secondName.isDefined) Right() else Left(InvalidName)
-      _ <- if (passportRegex.matches(rawUser.passport)) Right() else Left(InvalidPassport)
-    } yield User(rawUser.id.toLong, getUserName(rawUser), getPassport(rawUser))
+      id <- Either.fromOption(rawUser.id.toLongOption)(InvalidId)
+      username <- Either.fromOption(getUserName(rawUser))(InvalidName)
+      passport <- Either.fromOption(getPassport(rawUser))(InvalidPassport)
+    } yield User(id, username, passport)
 }
