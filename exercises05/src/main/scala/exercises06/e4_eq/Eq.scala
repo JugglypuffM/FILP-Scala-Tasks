@@ -9,12 +9,7 @@ object EqInstances {
   implicit def listEq[A](implicit ev: Eq[A]): Eq[List[A]] =
     (a: List[A], b: List[A]) => a.corresponds(b)(ev.eqv)
   implicit def optionEq[A](implicit ev: Eq[A]): Eq[Option[A]] =
-    (a: Option[A], b: Option[A]) =>
-      (a, b) match {
-        case (Some(x), Some(y)) => ev.eqv(x, y)
-        case (None, None)       => true
-        case _                  => false
-      }
+    (a: Option[A], b: Option[A]) => a.corresponds(b)(ev.eqv)
 }
 
 object EqSyntax {
