@@ -24,7 +24,7 @@ object TransformerInstances {
 }
 
 object TransformerSyntax {
-  implicit class TransformerOps[A](val value: A) extends AnyVal{
+  implicit class TransformerOps[A](val value: A) extends AnyVal {
     def transformToOption[B]()(implicit transformer: Transformer[A, B]): Option[B]        = transformer.toOption(value)
     def transformToEither[B]()(implicit transformer: Transformer[A, B]): Either[Error, B] = transformer.toEither(value)
   }

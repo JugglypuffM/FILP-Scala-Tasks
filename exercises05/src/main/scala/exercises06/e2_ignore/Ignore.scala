@@ -16,7 +16,7 @@ object IgnoreInstances {
   implicit val ignoreOption: Ignore[Option] = new Ignore[Option] {
     def ignore[A](m: Option[A])(f: A => Boolean): Option[A] = m match {
       case Some(v) => if (!f(v)) Some(v) else None
-      case None => None
+      case None    => None
     }
   }
   implicit val ignoreVector: Ignore[Vector] = new Ignore[Vector] {
