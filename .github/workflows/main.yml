@@ -41,3 +41,7 @@ jobs:
       - name: Compile and test exercises06
         if: github.event.pull_request.head.ref == 'exercises06'
         run: sbt "project exercises06" clean scalafmtCheck test:scalafmtCheck scalafix compile test
+
+      - name: Compile and test exercises07
+        if: github.event.pull_request.head.ref == 'exercises07'
+        run: sbt "project exercises07" clean scalafmtCheck test:scalafmtCheck scalafix compile test
