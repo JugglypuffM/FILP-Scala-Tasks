@@ -5,8 +5,10 @@ import scala.Integral.Implicits.infixIntegralOps
 object Examples {
   // сделайте так, чтобы скомпилировалось
   implicit class listOps[A: Integral](list: List[A]) {
-    def filterOdd: List[A]  = list.filter(_.toInt % 2 != 0)
-    def filterEven: List[A] = list.filter(_.toInt % 2 == 0)
+    private val divider: A  = Integral[A].fromInt(2)
+    private val zero: A     = Integral[A].fromInt(0)
+    def filterOdd: List[A]  = list.filter(_ % divider != zero)
+    def filterEven: List[A] = list.filter(_ % divider == zero)
   }
 
   List[Int](1, 2, 3).filterOdd

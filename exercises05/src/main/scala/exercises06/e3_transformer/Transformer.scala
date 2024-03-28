@@ -9,17 +9,24 @@ trait Transformer[A, B] {
 }
 
 object TransformerInstances {
-  implicit val transformer: Transformer[RawUser, User] = new Transformer[RawUser, User] {
-    def toOption(a: RawUser): Option[User] = (a.id.toLongOption, a.firstName, a.secondName) match {
-      case (Some(id), Some(first), Some(second)) => Some(User(id, UserName(first, second, a.thirdName)))
-      case _                                     => None
-    }
+  private def getUserName(rawUser: RawUser): Option[UserName] =
+    for {
+      firstName  <- rawUser.firstName
+      secondName <- rawUser.secondName
+    } yield UserName(firstName, secondName, rawUser.thirdName)
 
-    def toEither(a: RawUser): Either[Error, User] = (a.id.toLongOption, a.firstName, a.secondName) match {
-      case (Some(id), Some(first), Some(second)) => Right(User(id, UserName(first, second, a.thirdName)))
-      case (None, _, _)                          => Left(InvalidId)
-      case _                                     => Left(InvalidName)
-    }
+  implicit val transformer: Transformer[RawUser, User] = new Transformer[RawUser, User] {
+    def toOption(a: RawUser): Option[User] =
+      for {
+        id       <- a.id.toLongOption
+        username <- getUserName(a)
+      } yield User(id, username)
+
+    def toEither(a: RawUser): Either[Error, User] =
+      for {
+        id       <- a.id.toLongOption.toRight(InvalidId)
+        username <- getUserName(a).toRight(InvalidName)
+      } yield User(id, username)
   }
 }
 

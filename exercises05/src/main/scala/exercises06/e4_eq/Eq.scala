@@ -4,6 +4,10 @@ trait Eq[A] {
   def eqv(a: A, b: A): Boolean
 }
 
+object Eq {
+  def apply[A](implicit ev: Eq[A]): Eq[A] = ev
+}
+
 object EqInstances {
   implicit def basicEq[A]: Eq[A] = (x: A, y: A) => x == y
   implicit def listEq[A](implicit ev: Eq[A]): Eq[List[A]] =
@@ -13,7 +17,7 @@ object EqInstances {
 }
 
 object EqSyntax {
-  implicit class EqOps[A](val x: A) {
+  implicit class EqOps[A](val x: A) extends AnyVal {
     def eqv(y: A)(implicit ev: Eq[A]): Boolean = ev.eqv(x, y)
     def ===(y: A)(implicit ev: Eq[A]): Boolean = ev.eqv(x, y)
     def !==(y: A)(implicit ev: Eq[A]): Boolean = !ev.eqv(x, y)
