@@ -6,7 +6,7 @@ trait Ignore[M[_]] {
 }
 
 object Ignore {
-  def apply[M[_]: Ignore](implicit io: Ignore[M]): Ignore[M] = io
+  def apply[M[_]: Ignore]: Ignore[M] = implicitly
 }
 
 object IgnoreInstances {
@@ -28,7 +28,7 @@ object IgnoreInstances {
 object IgnoreSyntax {
   // возможно, стоит изменить сигнатуру
   implicit class IgnoreOps[M[_]: Ignore, A](m: M[A]) {
-    def ignore(f: A => Boolean)(implicit io: Ignore[M]): M[A] = io.ignore(m)(f)
+    def ignore(f: A => Boolean): M[A] = Ignore[M].ignore(m)(f)
   }
 }
 

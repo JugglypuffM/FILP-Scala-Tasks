@@ -16,11 +16,7 @@ object TransformerInstances {
     } yield UserName(firstName, secondName, rawUser.thirdName)
 
   implicit val transformer: Transformer[RawUser, User] = new Transformer[RawUser, User] {
-    def toOption(a: RawUser): Option[User] =
-      for {
-        id       <- a.id.toLongOption
-        username <- getUserName(a)
-      } yield User(id, username)
+    def toOption(a: RawUser): Option[User] = toEither(a).toOption
 
     def toEither(a: RawUser): Either[Error, User] =
       for {
