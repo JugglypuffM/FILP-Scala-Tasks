@@ -72,7 +72,7 @@ object Exercise01 {
 
         def pure[A](x: A): Option[A] = Some(x)
 
-        def foldLeft[A, B](fa: Option[A], b: B)(f: (B, A) => B): B = fa.iterator.foldLeft(b)(f)
+        def foldLeft[A, B](fa: Option[A], b: B)(f: (B, A) => B): B = fa.fold(b)(f(b, _))
         def map[A, B](fa: Option[A])(f: A => B): Option[B]         = fa.map(f)
       }
 
