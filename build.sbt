@@ -42,6 +42,12 @@ lazy val exercises07 = project in file("exercises07") settings (
   addCompilerPlugin(kindProjectorDep)
 )
 
+lazy val exercises08 = project in file("exercises08") settings (
+  libraryDependencies ++= libraries,
+  scalacOptions ++= Seq("-feature", "-language:implicitConversions"),
+  addCompilerPlugin(kindProjectorDep)
+)
+
 
 // lectures
 lazy val lecture02 = project in file("lecture02") settings (libraryDependencies ++= libraries)
