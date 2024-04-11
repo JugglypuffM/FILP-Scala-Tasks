@@ -46,13 +46,23 @@ object StatelessRandom {
   // так далее.
 
   // Реализуйте функцию, которая будет генерировать пару случайных целых чисел
-  def pair(rnd: Random): ((Int, Int), Random) = ((rnd.nextInt._1, rnd.nextInt._2.nextInt._1), rnd.nextInt._2.nextInt._2)
+  def pair(rnd: Random): ((Int, Int), Random) = {
+    val (int1, rnd1) = rnd.nextInt
+    val (int2, rnd2) = rnd1.nextInt
+    ((int1, int2), rnd2)
+  }
 
   // Функцию, которая генерирует неотрицальные числа
-  def nonNegativeInt(rnd: Random): (Int, Random) = (math.abs(rnd.nextInt._1), rnd.nextInt._2)
+  def nonNegativeInt(rnd: Random): (Int, Random) = {
+    val (int1, rnd1) = rnd.nextInt
+    (math.abs(int1), rnd1)
+  }
 
   // Функцию, которая генерирует случайное число от нуля включительно до единицы невключительно
-  def double(rnd: Random): (Double, Random) = (1 / (rnd.nextInt._1 + 1), rnd.nextInt._2)
+  def double(rnd: Random): (Double, Random) = {
+    val (int1, rnd1) = rnd.nextInt
+    (1 / (int1 + 1), rnd1)
+  }
 }
 
 // Нам удалось избавиться от скрытого изменяемого состояния, но приходится передавать теперь его явно.
@@ -73,10 +83,16 @@ object BetterStatelessRandom {
       def pure[A](a: A): RandomState[A] = RandomState((a, _))
 
       def map[A, B](fa: RandomState[A])(f: A => B): RandomState[B] =
-        RandomState(rnd => (f(fa.run(rnd)._1), fa.run(rnd)._2))
+        RandomState(rnd => {
+          val (int1, rnd1) = fa.run(rnd)
+          (f(int1), rnd1)
+        })
 
       def flatMap[A, B](fa: RandomState[A])(f: A => RandomState[B]): RandomState[B] =
-        RandomState(rnd => f(fa.run(rnd)._1).run(fa.run(rnd)._2))
+        RandomState(rnd => {
+          val (int1, rnd1) = fa.run(rnd)
+          f(int1).run(rnd1)
+        })
     }
   }
 

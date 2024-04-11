@@ -1,10 +1,11 @@
 package writer
 
+import typeclasses.Monoid.syntax.MonoidOps
 import typeclasses._
 
 case class Writer[Log, A](log: Log, value: A) {
-  def tell(nextLog: Log)(implicit semigroup: Semigroup[Log]): Writer[Log, A] =
-    Writer(semigroup.combine(log, nextLog), value)
+  def tell(nextLog: Log)(implicit monoid: Monoid[Log]): Writer[Log, A] =
+    Writer(log |+| nextLog, value)
 }
 
 object Writer {

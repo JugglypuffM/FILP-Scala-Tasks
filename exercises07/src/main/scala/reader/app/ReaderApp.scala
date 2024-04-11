@@ -53,9 +53,9 @@ object ReaderApp extends App {
 
     def aggregate(currency: Currency, transactions: NonEmptyList[Transaction]): Reader[Exchanges, Transaction] =
       Reader(exc =>
-        transactions.reduce((t1, t2) =>
-          Transaction(currency, t1.price * exc(t1.currency, currency) + t2.price * exc(t2.currency, currency))
-        )
+        transactions
+          .map(t => Transaction(currency, t.price * exc(t.currency, currency)))
+          .reduce((t1, t2) => Transaction(currency, t1.price + t2.price))
       )
 
     def buyAll(wallet: Wallet): Reader[Exchanges, Wallet] =
