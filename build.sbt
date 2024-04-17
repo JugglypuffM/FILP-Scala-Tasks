@@ -48,6 +48,13 @@ lazy val exercises08 = project in file("exercises08") settings (
   addCompilerPlugin(kindProjectorDep)
 )
 
+lazy val exercises09 = project in file("exercises09") settings (
+  libraryDependencies ++= libraries,
+  scalacOptions ++= Seq("-feature", "-language:implicitConversions"),
+  libraryDependencies += "org.typelevel" %% "cats-core" % "2.10.0",
+  addCompilerPlugin(kindProjectorDep)
+)
+
 
 // lectures
 lazy val lecture02 = project in file("lecture02") settings (libraryDependencies ++= libraries)
@@ -56,5 +63,7 @@ lazy val lecture04 = project in file("lecture04") settings (libraryDependencies 
 lazy val lecture05 = project in file("lecture05") settings (libraryDependencies ++= libraries)
 lazy val lecture06 = project in file("lecture06") settings (libraryDependencies ++= libraries) settings addCompilerPlugin(kindProjectorDep)
 lazy val lecture07 = project in file("lecture07") settings (libraryDependencies ++= libraries) settings addCompilerPlugin(kindProjectorDep)
+lazy val lecture08 = project in file("lecture08") settings (libraryDependencies ++= libraries) settings addCompilerPlugin(kindProjectorDep)
+lazy val lecture09 = project in file("lecture09") settings (libraryDependencies ++= libraries) settings addCompilerPlugin(kindProjectorDep)
 
 lazy val kindProjectorDep = "org.typelevel" % "kind-projector" % "0.13.2" cross CrossVersion.full
