@@ -27,7 +27,7 @@ object ThreadPool {
     // Worker потоки читают эту очередь, берут из нее задачи, выполнюят их.
     // Следует использовать Thread safe структуру данных, так как несколько потоков будут брать
     // из очереди объекты, тем самым мутируя ее.
-    val queue: java.util.concurrent.BlockingQueue[() => Unit] = ???
+    val queue: java.util.concurrent.BlockingQueue[() => Unit] = new LinkedBlockingQueue[() => Unit]()
 
     private val workerThreads = new ArrayBuffer[WorkerThread]()
 
@@ -47,14 +47,22 @@ object ThreadPool {
        */
       @tailrec
       private final def workerThreadAlg(): Unit = {
-        ???
+        Try(queue.poll(ttl.length, ttl.unit)).fold(
+          _ => threadState.set(Terminated),
+          task => {
+            threadState.set(Busy)
+            task()
+            threadState.set(FreeForWork)
+          }
+        )
+        if (threadState.get() == Terminated) return
         workerThreadAlg()
       }
 
       val threadState: AtomicReference[ThreadState] = new AtomicReference[ThreadState](FreeForWork)
 
       // Функция запускает поток, который выполняет workerThreadAlg в вечной рекурсии.
-      def start(): Unit = ???
+      def start(): Unit = factory.startThread(() => workerThreadAlg()).start()
     }
 
     def startWorkerThread(): Unit = {
@@ -68,7 +76,11 @@ object ThreadPool {
     // можно создать новый worker поток.
     // Может возникнуть конкуренция, если несколько потоков проверят какое-нибудь условие, войдут в блок создания потока,
     // создадут потоков больше чем maxThreads. Для избежания этого можно воспользоваться блоком synchronized или ReentrantLock.
-    def tryToExpandThreads(): Unit = ???
+    def tryToExpandThreads(): Unit = synchronized {
+      val busy   = workerThreads.count(_.threadState.get() == Busy)
+      val active = workerThreads.length - workerThreads.count(_.threadState.get() == Terminated)
+      if ((active == busy) && (active < maxThreads)) startWorkerThread()
+    }
 
     def execute(task: () => Unit): Unit = {
       tryToExpandThreads()
