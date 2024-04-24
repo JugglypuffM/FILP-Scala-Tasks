@@ -1,4 +1,6 @@
-package competition
+package ex1.competition
+
+import ex1.twitter.domain.User
 
 /**
   * Конкурс! Кто наберет больше лайков под своим постом - тот победил

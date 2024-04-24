@@ -49,3 +49,11 @@ jobs:
       - name: Compile and test exercises08
         if: github.event.pull_request.head.ref == 'exercises08'
         run: sbt "project exercises08" clean scalafmtCheck test:scalafmtCheck compile test
+
+      - name: Compile and test exercises09
+        if: github.event.pull_request.head.ref == 'exercises09'
+        run: sbt "project exercises09" clean scalafmtCheck test:scalafmtCheck compile test
+
+      - name: Compile and test exercises10
+        if: github.event.pull_request.head.ref == 'exercises10'
+        run: sbt "project exercises10" clean scalafmtCheck test:scalafmtCheck compile test

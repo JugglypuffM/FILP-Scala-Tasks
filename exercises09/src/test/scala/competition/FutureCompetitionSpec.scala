@@ -3,10 +3,6 @@ package competition
 import java.util.concurrent.Executors
 
 import org.scalatest.wordspec.AnyWordSpec
-import competition.domain.ScenarioError.TopAuthorNotFound
-import service.{TwitterService, TwitterServiceFuture}
-import twitter.domain.User
-import twitter.{LocalTwitterApi, TwitterApi}
 
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, ExecutionContext, Future}

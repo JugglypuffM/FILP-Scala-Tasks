@@ -1,7 +1,9 @@
-package twitter
+package ex1.twitter
+
+import ex1.twitter.domain.TwitterError.{LikeAlreadyExistError, LikeNotExistError, TweetNotExistError}
+import ex1.twitter.domain.{TweetId, TweetInfo, TwitterError, User}
 
 import java.time.Instant
-
 import scala.collection.concurrent.TrieMap
 import scala.util.{Failure, Success, Try}
 

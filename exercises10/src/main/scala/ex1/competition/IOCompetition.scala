@@ -1,6 +1,10 @@
-package competition
+package ex1.competition
 
-import scala.concurrent.{ExecutionContext, Future}
+import cats.syntax.all._
+import cats.effect.{IO, IOApp}
+import domain.ScenarioError.TopAuthorNotFound
+import ex1.service.TwitterService
+import ex1.twitter.domain.User
 
 /**
   * Конкурс! Кто наберет больше лайков под своим постом - тот победил
@@ -18,28 +22,21 @@ import scala.concurrent.{ExecutionContext, Future}
   * CompetitionMethods.unlikeAll
   * CompetitionMethods.topAuthor
   */
-class FutureCompetition(service: TwitterService[Future], methods: CompetitionMethods[Future])(
-    implicit ec: ExecutionContext
-) extends Competition[Future] {
-  def winner(
-      users: List[User],
-      followers: Map[User, List[User]],
-      botUser: User
-  ): Future[User] = ???
+class IOCompetition(service: TwitterService[IO], methods: CompetitionMethods[IO]) extends Competition[IO] {
+  def winner(users: List[User], followers: Map[User, List[User]], botUser: User): IO[User] = ???
 }
 
-object FutureCompetitionStart extends App {
+object IOCompetitionRun extends IOApp {
+  import cats.effect.ExitCode
+  import ex1.service.TwitterServiceIO
+  import ex1.twitter.{LocalTwitterApi, TwitterApi}
   import scala.util.Random
-  import scala.concurrent.duration.DurationInt
-  import scala.concurrent.Await
-
-  implicit val ec: ExecutionContext = ExecutionContext.global
 
   val api: TwitterApi = new LocalTwitterApi(Iterator.continually((Random.nextDouble() * 1000).toInt))
 
-  val service: TwitterService[Future] = new TwitterServiceFuture(api)
+  val service: TwitterService[IO] = new TwitterServiceIO(api)
 
-  val methods: CompetitionMethods[Future] = new CompetitionMethods[Future](service)
+  val methods: CompetitionMethods[IO] = new CompetitionMethods[IO](service)
 
   val oleg: User   = User("oleg")
   val ivan: User   = User("ivan")
@@ -57,7 +54,11 @@ object FutureCompetitionStart extends App {
     bot    -> List(bot)
   )
 
-  private val winner: User =
-    Await.result(new FutureCompetition(service, methods).winner(users, followers, bot), 30.seconds)
-  println(s"${winner.id} win!!!")
+  val competition: Competition[IO] = new IOCompetition(service, methods)
+
+  def run(args: List[String]): IO[ExitCode] =
+    for {
+      winner <- competition.winner(users, followers, bot)
+      _      <- IO.delay(println(winner))
+    } yield ExitCode.Success
 }
