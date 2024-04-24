@@ -1,8 +1,10 @@
-package competition
+package ex1.competition
 
 import cats.Monad
 import cats.syntax.all._
 import cats.instances.all._
+import ex1.service.TwitterService
+import ex1.twitter.domain.{TweetId, User}
 
 class CompetitionMethods[F[_]: Monad](service: TwitterService[F]) {
 

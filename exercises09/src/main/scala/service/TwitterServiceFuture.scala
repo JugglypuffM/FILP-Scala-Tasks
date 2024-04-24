@@ -1,10 +1,5 @@
 package service
 
-import service.domain.{GetTweetResponse, GetTweetsResponse}
-import twitter.TwitterApi
-import twitter.domain.TwitterError.{LikeAlreadyExistError, LikeNotExistError, TweetNotExistError}
-import twitter.domain.{TweetId, User}
-
 import scala.concurrent.{ExecutionContext, Future, Promise}
 
 

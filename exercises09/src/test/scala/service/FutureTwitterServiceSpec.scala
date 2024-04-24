@@ -1,9 +1,6 @@
 package service
 
 import org.scalatest.wordspec.AnyWordSpec
-import service.domain.GetTweetResponse.{Found, NotFound}
-import twitter.domain.{TweetId, User}
-import twitter.{LocalTwitterApi, TwitterApi}
 
 import java.util.concurrent.Executors
 import scala.concurrent.duration.DurationInt

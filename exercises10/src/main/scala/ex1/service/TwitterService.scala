@@ -1,4 +1,7 @@
-package service
+package ex1.service
+
+import ex1.twitter.domain._
+import domain._
 
 trait TwitterService[F[_]] {
   def tweet(user: User, text: String): F[TweetId]
