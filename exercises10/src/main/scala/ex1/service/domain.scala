@@ -1,4 +1,6 @@
-package service
+package ex1.service
+
+import ex1.twitter.domain._
 
 object domain {
   sealed trait GetTweetResponse
