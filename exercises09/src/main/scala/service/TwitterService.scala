@@ -1,5 +1,8 @@
 package service
 
+import service.domain.{GetTweetResponse, GetTweetsResponse}
+import twitter.domain.{TweetId, User}
+
 trait TwitterService[F[_]] {
   def tweet(user: User, text: String): F[TweetId]
 

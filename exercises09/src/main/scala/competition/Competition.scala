@@ -1,5 +1,7 @@
 package competition
 
+import twitter.domain.User
+
 /**
   * Конкурс! Кто наберет больше лайков под своим постом - тот победил
   *
