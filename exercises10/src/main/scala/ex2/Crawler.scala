@@ -1,6 +1,7 @@
 package ex2
 
 import cats.effect.IO
+import cats.effect.unsafe.implicits.global
 import cats.implicits._
 
 /*
@@ -51,5 +52,37 @@ import cats.implicits._
  */
 class Crawler(client: HttpClient[IO]) {
 
-  def crawl(root: HttpClient.URL): IO[Set[HttpClient.URL]] = ???
+  def crawl(root: HttpClient.URL): IO[Set[HttpClient.URL]] = {
+    def crawl_inner(
+        urls: List[HttpClient.URL],
+        visited: Set[HttpClient.URL],
+        banned: Set[HttpClient.URL],
+        attempt: Integer
+    ): IO[Set[HttpClient.URL]] = {
+      if (attempt == 3) {
+        crawl_inner(urls.tail, visited, banned + urls.head, 0)
+      } else {
+        IO(
+          urls.headOption match {
+            case None => visited
+            case Some(x) =>
+              client
+                .get(x)
+                .map(r => UrlSearch.search(root, x, r))
+                .flatMap(inner_links =>
+                  crawl_inner(
+                    (inner_links.toList ::: urls).toSet.diff(visited |+| banned + x).toList,
+                    visited + x,
+                    banned,
+                    0
+                  )
+                )
+                .unsafeRunSync()
+          }
+        ).handleErrorWith(_ => crawl_inner(urls, visited, banned, attempt + 1))
+      }
+    }
+
+    crawl_inner(List(root), Set(root), Set(), 0)
+  }
 }
