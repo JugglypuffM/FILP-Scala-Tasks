@@ -63,6 +63,29 @@ lazy val exercises10 = project in file("exercises10") settings (
   addCompilerPlugin(kindProjectorDep)
 )
 
+lazy val workshop = project in file("workshop") settings (
+  scalacOptions ++= Seq("-feature", "-language:implicitConversions"),
+  libraryDependencies ++= Seq(
+    "com.github.pureconfig" %% "pureconfig" % "0.17.6",
+    "org.xerial" % "sqlite-jdbc" % "3.45.3.0",
+    "org.tpolecat" %% "doobie-core" % "1.0.0-RC4",
+    "org.tpolecat" %% "doobie-hikari" % "1.0.0-RC4",
+    "org.http4s" %% "http4s-ember-server" % "0.23.26",
+    "org.http4s" %% "http4s-dsl" % "0.23.26",
+    "org.http4s" %% "http4s-ember-client" % "0.23.26",
+    "org.http4s" %% "http4s-circe" % "0.23.26",
+    "io.circe" %% "circe-generic" % "0.14.6",
+    "io.circe" %% "circe-literal" % "0.14.6",
+    "io.circe" %% "circe-parser" % "0.14.6",
+    "com.github.fd4s" %% "fs2-kafka" % "3.5.0",
+    "ch.qos.logback" % "logback-classic" % "1.5.3",
+    "org.scalatest" %% "scalatest" % "3.2.3" % Test,
+    "org.scalamock" %% "scalamock" % "5.1.0" % Test,
+    "org.typelevel" %% "cats-effect-testing-scalatest" % "1.5.0" % Test
+  ),
+  addCompilerPlugin(kindProjectorDep)
+)
+
 
 // lectures
 lazy val lecture02 = project in file("lecture02") settings (libraryDependencies ++= libraries)
