@@ -7,6 +7,8 @@ import doobie.implicits._
 import registry.domain.model.{Application, Passport, PhoneNumber, User}
 import registry.domain.service.ApplicationAlg
 
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import scala.concurrent.duration.FiniteDuration
 
 object ApplicationAlg {
@@ -23,18 +25,26 @@ object ApplicationAlg {
     override def getApplicationBy(user: User): F[Option[Application.Id]] =
       for {
         response <- sql"""
-                    SELECT id
+                    SELECT id, expired
                     FROM application
                     WHERE passport = ${user.passport.serial.value ++ user.passport.number.value}
                   """
-          .query[String]
+          .query[(String, String)]
           .to[List]
           .transact(transactor)
           .map(_.headOption)
         res <- response match {
-          case Some(id) =>
+          case Some((id, expired)) =>
+            val exp = ZonedDateTime.from(DateTimeFormatter.ISO_DATE_TIME.parse(expired))
+            val current = ZonedDateTime.now
             val appId = Application.Id(id)
-            appId.some.pure[F]
+            if (current.isBefore(exp)){
+              appId.some.pure[F]
+            }
+            else{
+              remove(appId)
+              None.pure[F]
+            }
           case None => None.pure[F]
         }
       } yield res
@@ -42,30 +52,38 @@ object ApplicationAlg {
     override def getUserBy(appId: Application.Id): F[Option[User]] =
       for {
         response <- sql"""
-                    SELECT passport, name, surname, patronymic, phone
+                    SELECT passport, name, surname, patronymic, phone, expired
                     FROM application
                     WHERE id = ${appId.value}
                   """
-          .query[(String, String, String, Option[String], String)]
+          .query[(String, String, String, Option[String], String, String)]
           .to[List]
           .transact(transactor)
           .map(_.headOption)
         res <- response match {
-          case Some((passport, name, surname, patronymic, phone)) =>
-            User(name, surname, patronymic, Passport.parseUnsafe(passport), PhoneNumber.parseUnsafe(phone)).some.pure[F]
+          case Some((passport, name, surname, patronymic, phone, expired)) =>
+            val exp = ZonedDateTime.from(DateTimeFormatter.ISO_DATE_TIME.parse(expired))
+            val current = ZonedDateTime.now
+            if (current.isBefore(exp)){
+              User(name, surname, patronymic, Passport.parseUnsafe(passport), PhoneNumber.parseUnsafe(phone)).some.pure[F]
+            }
+            else{
+              None.pure[F]
+            }
           case None => None.pure[F]
         }
 
       } yield res
 
     override def persist(appId: Application.Id, user: User, ttl: FiniteDuration): F[Unit] = sql"""
-      INSERT INTO application (id, passport, name, surname, patronymic, phone) VALUES (
+      INSERT INTO application (id, passport, name, surname, patronymic, phone, expired) VALUES (
         ${appId.value},
         ${user.passport.serial.value + user.passport.number.value},
         ${user.name},
         ${user.surname},
         ${user.patronymic},
         ${user.phoneNumber.country + user.phoneNumber.code + user.phoneNumber.number},
+        ${ZonedDateTime.now().plusSeconds(ttl.toSeconds).format(DateTimeFormatter.ISO_DATE_TIME)}
       )
     """.update.run.transact(transactor).as(())
 
@@ -82,7 +100,8 @@ object ApplicationAlg {
        name TEXT NOT NULL,
        surname TEXT NOT NULL,
        patronymic TEXT,
-       phone TEXT NOT NULL
+       phone TEXT NOT NULL,
+       expired TEXT NOT NULL
      )
   """.update.run
 }
