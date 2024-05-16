@@ -2,6 +2,7 @@ package registry.domain.model
 
 import cats.data.Validated._
 import cats.data.ValidatedNec
+import cats.syntax.all._
 import registry.domain.model.ValidationError.PassportIsInvalid
 
 case class Passport private (serial: Passport.Serial, number: Passport.Number)

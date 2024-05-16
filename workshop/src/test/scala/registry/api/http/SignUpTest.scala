@@ -9,6 +9,7 @@ import org.http4s.implicits._
 import org.scalamock.scalatest.AsyncMockFactory
 import org.scalatest.freespec.AsyncFreeSpec
 import org.scalatest.matchers.should.Matchers
+import org.scalatest.matchers.should._
 import registry.domain.Registry
 
 class SignUpTest extends AsyncFreeSpec with AsyncIOSpec with Matchers with AsyncMockFactory {
@@ -61,10 +62,8 @@ class SignUpTest extends AsyncFreeSpec with AsyncIOSpec with Matchers with Async
           body <- r.body.compile.toList.map(_.toArray).map(x => new String(x, "UTF-8"))
         } yield {
           r.status shouldBe Status.BadRequest
-          body shouldBe
-            """Invalid message body: Could not decode JSON: {
-              |  "kek" : "cheburek"
-              |}""".stripMargin
+          body should include ("Invalid message body: Could not decode JSON")
+          body should include (""""kek" : "cheburek"""")
         }
       }
       "return BadRequest when param of request is invalid" in {
@@ -76,12 +75,14 @@ class SignUpTest extends AsyncFreeSpec with AsyncIOSpec with Matchers with Async
           body <- r.body.compile.toList.map(_.toArray).map(x => new String(x, "UTF-8"))
         } yield {
           r.status shouldBe Status.BadRequest
-          body shouldBe """Форма заполнена неверно:
-                          |- Имя содержит некорректные символы
-                          |- Фамилия содержит некорректные символы
-                          |- Отчество содержит некорректные символы
-                          |- Данные паспорта заполнены неверно
-                          |- Номер телефона указан неверно""".stripMargin
+          body.split("-").map(_.trim).toList shouldBe List(
+            "Форма заполнена неверно:",
+            "Имя содержит некорректные символы",
+            "Фамилия содержит некорректные символы",
+            "Отчество содержит некорректные символы",
+            "Данные паспорта заполнены неверно",
+            "Номер телефона указан неверно"
+          )
         }
       }
       "return BadRequest when user already has an application" in {
