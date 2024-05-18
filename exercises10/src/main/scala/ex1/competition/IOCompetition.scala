@@ -1,11 +1,10 @@
 package ex1.competition
 
-import cats.effect.ExitCode.Success
 import cats.syntax.all._
 import cats.effect.{IO, IOApp}
 import domain.ScenarioError.TopAuthorNotFound
 import ex1.service.TwitterService
-import ex1.twitter.domain.User
+import ex1.twitter.domain.{TweetId, User}
 
 import scala.util.{Failure, Try}
 
@@ -26,12 +25,14 @@ import scala.util.{Failure, Try}
   * CompetitionMethods.topAuthor
   */
 class IOCompetition(service: TwitterService[IO], methods: CompetitionMethods[IO]) extends Competition[IO] {
+
+  private def likeByAll(users: List[User], tweet: TweetId): IO[TweetId] =
+    users.parTraverse(user => service.like(user, tweet)).as(tweet)
+
   def winner(users: List[User], followers: Map[User, List[User]], botUser: User): IO[User] =
     for {
       tweets <- users.parTraverse(user =>
-        service
-          .tweet(user, "${user.id} will win!")
-          .flatMap(id => followers(user).parTraverse(service.like(_, id)).map(_ => id))
+        service.tweet(user, "${user.id} will win!").flatMap(likeByAll(followers(user), _))
       )
       _      <- methods.unlikeAll(botUser, tweets)
       option <- methods.topAuthor(tweets)

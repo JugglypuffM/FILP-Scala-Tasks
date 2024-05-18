@@ -5,7 +5,7 @@ import cats.syntax.all._
 import ex1.service.domain.GetTweetResponse.{Found, NotFound}
 import ex1.service.domain.{GetTweetResponse, GetTweetsResponse}
 import ex1.twitter.TwitterApi
-import ex1.twitter.domain.TwitterError.{LikeAlreadyExistError, LikeNotExistError}
+import ex1.twitter.domain.TwitterError.{LikeAlreadyExistError, LikeNotExistError, TweetNotExistError}
 import ex1.twitter.domain._
 
 import scala.util.{Failure, Success}
@@ -25,14 +25,10 @@ class TwitterServiceIO(api: TwitterApi) extends TwitterService[IO] {
     }
 
   def getTweet(tweetId: TweetId): IO[GetTweetResponse] =
-    IO.async_(cb =>
-      api.get(tweetId)(x =>
-        cb(x match {
-          case Success(value) => Right(Found(value))
-          case Failure(_)     => Right(NotFound(tweetId))
-        })
-      )
-    )
+    IO.async_((cb: Either[Throwable, GetTweetResponse] => Unit) => api.get(tweetId)(x => cb(x.toEither.map(Found))))
+      .recover {
+        case TweetNotExistError => NotFound(tweetId)
+      }
 
   def getTweets(ids: List[TweetId]): IO[GetTweetsResponse] =
     for {
