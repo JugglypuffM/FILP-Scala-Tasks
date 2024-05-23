@@ -14,10 +14,11 @@ object SQLiteStand {
       config.setMaximumPoolSize(1)
       HikariTransactor.fromHikariConfig[IO](config, None)
     }
-    transactor.use { t => for {
-      alg    <- init(t)
-      result <- app(alg)
-     } yield result
+    transactor.use { t =>
+      for {
+        alg    <- init(t)
+        result <- app(alg)
+      } yield result
     }
   }
 

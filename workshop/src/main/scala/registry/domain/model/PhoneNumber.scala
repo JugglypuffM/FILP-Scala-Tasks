@@ -10,11 +10,12 @@ import scala.util.matching.Regex
 case class PhoneNumber private (country: String, code: String, number: String)
 
 object PhoneNumber {
-  private val phoneRegex: Regex = raw"\+?(\d)(\d{3})(\d{7})".r
+  private val phoneRegex: Regex = raw"(\+7|8)\s*(\d{3})\s*(\d{7})".r
 
   //TODO: сделать парсинг номера телефона
   def parse(raw: String): ValidatedNec[PhoneIsInvalid, PhoneNumber] = raw match {
-    case phoneRegex(country, code, number) => PhoneNumber(country, code, number).validNec
+    case phoneRegex(country, code, number) =>
+      PhoneNumber(country, code, number).validNec
     case _ => PhoneIsInvalid.invalidNec
   }
   @SuppressWarnings(Array("scalafix:DisableSyntax.throw"))

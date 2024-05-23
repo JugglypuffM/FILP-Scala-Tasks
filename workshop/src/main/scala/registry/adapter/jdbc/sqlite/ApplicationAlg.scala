@@ -35,13 +35,12 @@ object ApplicationAlg {
           .map(_.headOption)
         res <- response match {
           case Some((id, expired)) =>
-            val exp = ZonedDateTime.from(DateTimeFormatter.ISO_DATE_TIME.parse(expired))
+            val exp     = ZonedDateTime.from(DateTimeFormatter.ISO_DATE_TIME.parse(expired))
             val current = ZonedDateTime.now
-            val appId = Application.Id(id)
-            if (current.isBefore(exp)){
+            val appId   = Application.Id(id)
+            if (current.isBefore(exp)) {
               appId.some.pure[F]
-            }
-            else{
+            } else {
               remove(appId)
               None.pure[F]
             }
@@ -62,12 +61,12 @@ object ApplicationAlg {
           .map(_.headOption)
         res <- response match {
           case Some((passport, name, surname, patronymic, phone, expired)) =>
-            val exp = ZonedDateTime.from(DateTimeFormatter.ISO_DATE_TIME.parse(expired))
+            val exp     = ZonedDateTime.from(DateTimeFormatter.ISO_DATE_TIME.parse(expired))
             val current = ZonedDateTime.now
-            if (current.isBefore(exp)){
-              User(name, surname, patronymic, Passport.parseUnsafe(passport), PhoneNumber.parseUnsafe(phone)).some.pure[F]
-            }
-            else{
+            if (current.isBefore(exp)) {
+              User(name, surname, patronymic, Passport.parseUnsafe(passport), PhoneNumber.parseUnsafe(phone)).some
+                .pure[F]
+            } else {
               None.pure[F]
             }
           case None => None.pure[F]

@@ -11,7 +11,13 @@ import registry.domain.service.UserAlg
 class UserAlgTest extends AsyncFreeSpec with AsyncIOSpec with Matchers {
   def stand: (UserAlg[IO] => IO[Assertion]) => IO[Assertion] = SQLiteStand(UserAlg.build[IO])
 
-  val testUser: User = User("Иван", "Иванов", Some("Иванович"), Passport.parseUnsafe("1234567890"), PhoneNumber.parseUnsafe("+79993332222"))
+  val testUser: User = User(
+    "Иван",
+    "Иванов",
+    Some("Иванович"),
+    Passport.parseUnsafe("1234567890"),
+    PhoneNumber.parseUnsafe("+79993332222")
+  )
 
   "UserAlg implementation via sqlite " - {
     "should " - {
@@ -24,4 +30,3 @@ class UserAlgTest extends AsyncFreeSpec with AsyncIOSpec with Matchers {
     }
   }
 }
-

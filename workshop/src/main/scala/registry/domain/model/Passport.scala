@@ -11,9 +11,9 @@ object Passport {
   private val passportRegex = raw"(\d{4})(\d{6})".r
 
   def parse(raw: String): ValidatedNec[PassportIsInvalid, Passport] =
-      raw match {
+    raw match {
       case passportRegex(s, n) => Passport(Passport.Serial(s), Passport.Number(n)).validNec
-      case _ => PassportIsInvalid.invalidNec
+      case _                   => PassportIsInvalid.invalidNec
     }
 
   @SuppressWarnings(Array("scalafix:DisableSyntax.throw"))

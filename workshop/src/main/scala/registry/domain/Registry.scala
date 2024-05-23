@@ -3,9 +3,11 @@ package registry.domain
 import cats._
 import cats.effect.Sync
 import cats.syntax.all._
+import registry.domain.Registry.Error.{UserAlreadyExists, UserApplicationAlreadyExists}
 import registry.domain.model.User
 import registry.domain.service.{ApplicationAlg, TrustworthinessAlg, UserAlg}
 
+import java.util.concurrent.TimeUnit
 import scala.concurrent.duration._
 import scala.util.control.NoStackTrace
 
@@ -26,5 +28,22 @@ object Registry {
       userAlg: UserAlg[F],
       appAlg: ApplicationAlg[F],
       trustworthinessAlg: TrustworthinessAlg[F]
-  ): Registry[F] = ???
+  ): Registry[F] = new Registry[F] {
+    def signUp(user: User): F[Unit] = {
+      for {
+        userOption <- userAlg.getBy(user.passport)
+        _ <- userOption match {
+          case Some(_) => MonadThrow[F].raiseError[Unit](UserAlreadyExists)
+          case None    => Sync[F].unit
+        }
+        appIdOption <- appAlg.getApplicationBy(user)
+        _ <- appIdOption match {
+          case Some(_) => MonadThrow[F].raiseError[Unit](UserApplicationAlreadyExists)
+          case None    => Sync[F].unit
+        }
+        appId <- trustworthinessAlg.check(user)
+        _     <- appAlg.persist(appId, user, FiniteDuration(1, TimeUnit.MINUTES))
+      } yield ()
+    }
+  }
 }

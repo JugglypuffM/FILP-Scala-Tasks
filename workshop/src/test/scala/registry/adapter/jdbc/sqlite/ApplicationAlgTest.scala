@@ -10,13 +10,18 @@ import registry.domain.service.ApplicationAlg
 
 import scala.concurrent.duration._
 
-
 class ApplicationAlgTest extends AsyncFreeSpec with AsyncIOSpec with Matchers {
 
   def stand: (ApplicationAlg[IO] => IO[Assertion]) => IO[Assertion] = SQLiteStand(ApplicationAlg.build[IO])
 
   val testAppId: Application.Id = Application.Id("appId")
-  val testUser: User = User("Иван", "Иванов", Some("Иванович"), Passport.parseUnsafe("1234567890"), PhoneNumber.parseUnsafe("+79993332222"))
+  val testUser: User = User(
+    "Иван",
+    "Иванов",
+    Some("Иванович"),
+    Passport.parseUnsafe("1234567890"),
+    PhoneNumber.parseUnsafe("+79993332222")
+  )
 
   "ApplicationAlg implementation via sqlite " - {
     "should " - {

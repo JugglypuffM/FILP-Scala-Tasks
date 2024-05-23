@@ -10,7 +10,7 @@ import registry.domain.model._
 
 class EventHandlerAlgImplTest extends AsyncFreeSpec with AsyncIOSpec with Matchers with AsyncMockFactory {
   trait Stand {
-    val userAlg: UserAlg[IO] = mock[UserAlg[IO]]
+    val userAlg: UserAlg[IO]       = mock[UserAlg[IO]]
     val appAlg: ApplicationAlg[IO] = mock[ApplicationAlg[IO]]
 
     val eventHandler: EventHandlerAlg[IO] = EventHandlerAlg.build[IO](userAlg, appAlg)

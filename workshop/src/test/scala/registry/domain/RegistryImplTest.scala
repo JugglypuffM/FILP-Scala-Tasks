@@ -9,27 +9,25 @@ import org.scalatest.matchers.should.Matchers
 import registry.domain.model._
 import registry.domain.service._
 
-
 class RegistryImplTest extends AsyncFreeSpec with AsyncIOSpec with Matchers with AsyncMockFactory {
 
   trait Stand {
-    val userAlg: UserAlg[IO] = mock[UserAlg[IO]]
-    val appAlg: ApplicationAlg[IO] = mock[ApplicationAlg[IO]]
+    val userAlg: UserAlg[IO]                      = mock[UserAlg[IO]]
+    val appAlg: ApplicationAlg[IO]                = mock[ApplicationAlg[IO]]
     val trustwortinessAlg: TrustworthinessAlg[IO] = mock[TrustworthinessAlg[IO]]
-    val registry: Registry[IO] = Registry.build[IO](userAlg, appAlg, trustwortinessAlg)
+    val registry: Registry[IO]                    = Registry.build[IO](userAlg, appAlg, trustwortinessAlg)
   }
 
   def stand: Stand = new Stand {}
 
   val testAppId: Application.Id = Application.Id("appId")
   val testUser: User = User(
-      "Иван",
-      "Иванов",
-      Some("Иванович"),
-      Passport.parseUnsafe("1234567890"),
-      PhoneNumber.parseUnsafe("+79993332222")
-    )
-
+    "Иван",
+    "Иванов",
+    Some("Иванович"),
+    Passport.parseUnsafe("1234567890"),
+    PhoneNumber.parseUnsafe("+79993332222")
+  )
 
   "RegistryImpl" - {
     "should" - {

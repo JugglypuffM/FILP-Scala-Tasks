@@ -36,7 +36,15 @@ class SignUp[F[_]: Concurrent](registry: Registry[F]) extends Http4sDsl[F] {
                   .handleErrorWith(handleE)
               case Invalid(errors) =>
                 //TODO: составить отформатированное сообщение об ошибках валидации
-                val message: String = ???
+                val message: String = errors.foldLeft("Форма заполнена неверно:\n")((res, err) =>
+                  res + (err match {
+                    case ValidationError.PhoneIsInvalid                 => "- Номер телефона указан неверно"
+                    case ValidationError.NameHasInvalidCharacters       => "- Имя содержит некорректные символы"
+                    case ValidationError.SurnameHasInvalidCharacters    => "- Фамилия содержит некорректные символы"
+                    case ValidationError.PatronymicHasInvalidCharacters => "- Отчество содержит некорректные символы"
+                    case ValidationError.PassportIsInvalid              => "- Данные паспорта заполнены неверно"
+                  })
+                )
                 BadRequest(message)
             }
           case Left(err) => BadRequest(err.getMessage())
@@ -45,6 +53,15 @@ class SignUp[F[_]: Concurrent](registry: Registry[F]) extends Http4sDsl[F] {
   }
 
   //TODO: обработать ошибки бизнес логики
-  private def handleE(err: Throwable): F[Response[F]] = ???
+  private def handleE(err: Throwable): F[Response[F]] = err match {
+    case Registry.Error.UserAlreadyExists =>
+      Response[F](Status.BadRequest).withEntity("Данный пользователь уже зарегистрирован в системе").pure[F]
+
+    case Registry.Error.UserApplicationAlreadyExists =>
+      Response[F](Status.BadRequest).withEntity("Заявка на регистрацию уже заведена").pure[F]
+
+    case _ =>
+      Response[F](Status.InternalServerError).withEntity("Произошла ошибка, повторите попытку позже: FAIL!!1!").pure[F]
+  }
 
 }

@@ -27,8 +27,8 @@ object App extends IOApp.Simple {
         http.TrustworthinessAlg.Auth(config.trustworthiness.auth.user, config.trustworthiness.auth.password),
         config.trustworthiness.uri
       )
-      eventObserver = kafka.EventObserverAlg.build[IO](
-        config.kafka.host, config.kafka.port, config.kafka.topic, config.kafka.group)
+      eventObserver = kafka.EventObserverAlg
+        .build[IO](config.kafka.host, config.kafka.port, config.kafka.topic, config.kafka.group)
       transactor = Transactor.fromDriverManager[IO](
         classOf[org.sqlite.JDBC].getName,
         config.sqlite.uri,
