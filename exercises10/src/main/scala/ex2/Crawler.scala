@@ -54,6 +54,8 @@ import scala.annotation.tailrec
   */
 class Crawler(client: HttpClient[IO]) {
 
+  private val ATTEMPTS_LEFT: Int = 2
+
   def crawl(root: HttpClient.URL): IO[Set[HttpClient.URL]] = {
 
     def tryVisit(url: HttpClient.URL, attemptsLeft: Int): IO[Either[HttpClient.URL, Set[HttpClient.URL]]] =
@@ -66,26 +68,26 @@ class Crawler(client: HttpClient[IO]) {
         }
       } yield result
 
+    def mapResults(
+        results: List[Either[HttpClient.URL, Set[HttpClient.URL]]]
+    ): (Set[HttpClient.URL], Set[HttpClient.URL]) =
+      results.partitionMap(identity).bimap(_.toSet, _.foldLeft(Set.empty[HttpClient.URL])(_ |+| _))
+
     def inner(
         unvisited: Set[HttpClient.URL],
         visited: Set[HttpClient.URL],
         banned: Set[HttpClient.URL]
     ): IO[Set[HttpClient.URL]] =
       for {
-        results <- unvisited.toList
-          .parTraverse(tryVisit(_, 2))
-          .map(list =>
-            list.foldLeft((Set[HttpClient.URL](), Set[HttpClient.URL]()))((pair, res) =>
-              res.fold(ban => (pair._1 + ban, pair._2), res => (pair._1, pair._2 |+| res))
-            )
-          )
-        new_banned    = banned |+| results._1
-        new_visited   = visited |+| unvisited.diff(results._1)
-        new_unvisited = results._2.diff(new_visited |+| new_banned)
-        result <- if (new_unvisited.nonEmpty) {
-          inner(new_unvisited, new_visited, new_banned)
+        results <- unvisited.toList.parTraverse(tryVisit(_, ATTEMPTS_LEFT))
+        (justBanned, justFound) = mapResults(results)
+        newBanned               = banned |+| justBanned
+        newVisited              = visited |+| unvisited.diff(justBanned)
+        newUnvisited            = justFound.diff(newVisited |+| newBanned)
+        result <- if (newUnvisited.nonEmpty) {
+          inner(newUnvisited, newVisited, newBanned)
         } else {
-          IO.pure(new_visited)
+          IO.pure(newVisited)
         }
       } yield result
 

@@ -33,11 +33,11 @@ class TwitterServiceIO(api: TwitterApi) extends TwitterService[IO] {
   def getTweets(ids: List[TweetId]): IO[GetTweetsResponse] =
     for {
       tweets <- ids.traverse(getTweet)
-      res = tweets.foldLeft(GetTweetsResponse(Set.empty[TweetId], Set.empty[TweetInfo]))((acc, elem) =>
-        elem match {
-          case Found(info)  => acc.copy(found = acc.found + info)
-          case NotFound(id) => acc.copy(notFound = acc.notFound + id)
-        }
-      )
-    } yield res
+      res = tweets.partitionMap {
+        case Found(info)  => Right(info)
+        case NotFound(id) => Left(id)
+      }
+      found    = res._2.toSet
+      notFound = res._1.toSet
+    } yield GetTweetsResponse(notFound, found)
 }
