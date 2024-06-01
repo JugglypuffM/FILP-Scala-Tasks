@@ -32,12 +32,9 @@ object EventHandlerAlg {
         case ApprovalEvent(appId, ApprovalEvent.Result.Trust) =>
           for {
             userOption <- appAlg.getUserBy(ae.appId)
-            user <- userOption match {
-              case Some(user) => user.pure[F]
-              case None       => MonadThrow[F].raiseError(UserNotFound)
-            }
-            _ <- userAlg.persist(user)
-            _ <- appAlg.remove(appId)
+            user       <- MonadThrow[F].fromOption(userOption, UserNotFound)
+            _          <- userAlg.persist(user)
+            _          <- appAlg.remove(appId)
           } yield {}.pure
         case ApprovalEvent(appId, ApprovalEvent.Result.Mistrust) => appAlg.remove(appId)
       }

@@ -22,6 +22,14 @@ class SignUp[F[_]: Concurrent](registry: Registry[F]) extends Http4sDsl[F] {
 
   private implicit val userDecoder: EntityDecoder[F, UserRaw] = jsonOf[F, UserRaw]
 
+  def getValidationErrorMessage(error: ValidationError): String = error match {
+    case ValidationError.PhoneIsInvalid                 => "- Номер телефона указан неверно"
+    case ValidationError.NameHasInvalidCharacters       => "- Имя содержит некорректные символы"
+    case ValidationError.SurnameHasInvalidCharacters    => "- Фамилия содержит некорректные символы"
+    case ValidationError.PatronymicHasInvalidCharacters => "- Отчество содержит некорректные символы"
+    case ValidationError.PassportIsInvalid              => "- Данные паспорта заполнены неверно"
+  }
+
   val route: HttpRoutes[F] = HttpRoutes.of[F] {
     case req @ POST -> Root / "signUp" =>
       for {
@@ -36,15 +44,8 @@ class SignUp[F[_]: Concurrent](registry: Registry[F]) extends Http4sDsl[F] {
                   .handleErrorWith(handleE)
               case Invalid(errors) =>
                 //TODO: составить отформатированное сообщение об ошибках валидации
-                val message: String = errors.foldLeft("Форма заполнена неверно:\n")((res, err) =>
-                  res + (err match {
-                    case ValidationError.PhoneIsInvalid                 => "- Номер телефона указан неверно"
-                    case ValidationError.NameHasInvalidCharacters       => "- Имя содержит некорректные символы"
-                    case ValidationError.SurnameHasInvalidCharacters    => "- Фамилия содержит некорректные символы"
-                    case ValidationError.PatronymicHasInvalidCharacters => "- Отчество содержит некорректные символы"
-                    case ValidationError.PassportIsInvalid              => "- Данные паспорта заполнены неверно"
-                  })
-                )
+                val message: String =
+                  errors.foldLeft("Форма заполнена неверно:\n")((res, err) => res + getValidationErrorMessage(err))
                 BadRequest(message)
             }
           case Left(err) => BadRequest(err.getMessage())

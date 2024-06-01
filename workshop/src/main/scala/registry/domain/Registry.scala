@@ -23,6 +23,11 @@ object Registry {
     case object UserApplicationAlreadyExists extends Error
   }
 
+  private def processOption[A, F[_]: MonadThrow: Sync](opt: Option[A], err: Error): F[Unit] = opt match {
+    case Some(_) => MonadThrow[F].raiseError(err)
+    case None    => Sync[F].unit
+  }
+
   //TODO: Реализовать бизнес логику
   def build[F[_]: MonadThrow: Sync](
       userAlg: UserAlg[F],
@@ -32,15 +37,11 @@ object Registry {
     def signUp(user: User): F[Unit] = {
       for {
         userOption <- userAlg.getBy(user.passport)
-        _ <- userOption match {
-          case Some(_) => MonadThrow[F].raiseError[Unit](UserAlreadyExists)
-          case None    => Sync[F].unit
-        }
+        _          <- processOption(userOption, UserAlreadyExists)
+
         appIdOption <- appAlg.getApplicationBy(user)
-        _ <- appIdOption match {
-          case Some(_) => MonadThrow[F].raiseError[Unit](UserApplicationAlreadyExists)
-          case None    => Sync[F].unit
-        }
+        _           <- processOption(appIdOption, UserApplicationAlreadyExists)
+
         appId <- trustworthinessAlg.check(user)
         _     <- appAlg.persist(appId, user, FiniteDuration(1, TimeUnit.MINUTES))
       } yield ()
