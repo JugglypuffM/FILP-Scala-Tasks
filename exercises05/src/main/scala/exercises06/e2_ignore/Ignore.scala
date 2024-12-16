@@ -6,15 +6,29 @@ trait Ignore[M[_]] {
 }
 
 object Ignore {
-  def apply[M[_]: Ignore]: Ignore[M] = ???
+  def apply[M[_]: Ignore]: Ignore[M] = implicitly
 }
 
-object IgnoreInstances {}
+object IgnoreInstances {
+  implicit val ignoreList: Ignore[List] = new Ignore[List] {
+    def ignore[A](m: List[A])(f: A => Boolean): List[A] = m.filterNot(f)
+  }
+  implicit val ignoreOption: Ignore[Option] = new Ignore[Option] {
+    def ignore[A](m: Option[A])(f: A => Boolean): Option[A] = m.filterNot(f)
+  }
+  implicit val ignoreVector: Ignore[Vector] = new Ignore[Vector] {
+    def ignore[A](m: Vector[A])(f: A => Boolean): Vector[A] = m.filterNot(f)
+  }
+  implicit val ignoreSet: Ignore[Set] = new Ignore[Set] {
+    def ignore[A](m: Set[A])(f: A => Boolean): Set[A] = m.filterNot(f)
+  }
+
+}
 
 object IgnoreSyntax {
   // возможно, стоит изменить сигнатуру
-  implicit class IgnoreOps[M[_], A](m: M[A]) {
-    ???
+  implicit class IgnoreOps[M[_]: Ignore, A](m: M[A]) {
+    def ignore(f: A => Boolean): M[A] = Ignore[M].ignore(m)(f)
   }
 }
 
