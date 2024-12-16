@@ -4,7 +4,9 @@ import cats.syntax.all._
 import cats.effect.{IO, IOApp}
 import domain.ScenarioError.TopAuthorNotFound
 import ex1.service.TwitterService
-import ex1.twitter.domain.User
+import ex1.twitter.domain.{TweetId, User}
+
+import scala.util.{Failure, Try}
 
 /**
   * Конкурс! Кто наберет больше лайков под своим постом - тот победил
@@ -23,7 +25,19 @@ import ex1.twitter.domain.User
   * CompetitionMethods.topAuthor
   */
 class IOCompetition(service: TwitterService[IO], methods: CompetitionMethods[IO]) extends Competition[IO] {
-  def winner(users: List[User], followers: Map[User, List[User]], botUser: User): IO[User] = ???
+
+  private def likeByAll(users: List[User], tweet: TweetId): IO[TweetId] =
+    users.parTraverse(user => service.like(user, tweet)).as(tweet)
+
+  def winner(users: List[User], followers: Map[User, List[User]], botUser: User): IO[User] =
+    for {
+      tweets <- users.parTraverse(user =>
+        service.tweet(user, "${user.id} will win!").flatMap(likeByAll(followers(user), _))
+      )
+      _      <- methods.unlikeAll(botUser, tweets)
+      option <- methods.topAuthor(tweets)
+      winner <- IO.fromOption(option)(TopAuthorNotFound)
+    } yield winner
 }
 
 object IOCompetitionRun extends IOApp {
