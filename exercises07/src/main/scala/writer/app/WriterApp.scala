@@ -6,6 +6,7 @@ import writer.Writer
 import typeclasses.Monad.syntax._
 import typeclasses.Monoid.syntax._
 import domain._
+import writer.Writer.monad
 
 object WriterApp extends App {
   case class Logs(list: List[String])
@@ -45,10 +46,20 @@ object WriterApp extends App {
         Writer.tell(Logs.single(str))
     }
 
-    def transact(good: Good): WithLogs[Transaction] = ???
+    def transact(good: Good): WithLogs[Transaction] =
+      Transaction(good.price).pure[WithLogs].tell(Logs.single(s"spent ${good.price}"))
 
-    def aggregate(transactions: NonEmptyList[Transaction]): WithLogs[Transaction] = ???
+    def aggregate(transactions: NonEmptyList[Transaction]): WithLogs[Transaction] = {
+      val all = transactions.reduce(Semigroup[Transaction].combine)
+      all.pure[WithLogs].tell(Logs.single(s"spent total ${all.price}"))
+    }
 
-    def buyAll(wallet: Wallet): WithLogs[Wallet] = ???
+    def buyAll(wallet: Wallet): WithLogs[Wallet] =
+      for {
+        transact1 <- transact(Good(1))
+        transact2 <- transact(Good(2))
+        transact3 <- transact(Good(3))
+        all       <- aggregate(NonEmptyList.of(transact1, transact2, transact3))
+      } yield wallet.copy(amount = wallet.amount - all.price)
   }
 }
