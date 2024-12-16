@@ -1,6 +1,11 @@
 package competition
 
+import competition.domain.ScenarioError.TopAuthorNotFound
+import service.TwitterService
+import twitter.domain.User
+
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success, Try}
 
 /**
   * Конкурс! Кто наберет больше лайков под своим постом - тот победил
@@ -25,13 +30,26 @@ class FutureCompetition(service: TwitterService[Future], methods: CompetitionMet
       users: List[User],
       followers: Map[User, List[User]],
       botUser: User
-  ): Future[User] = ???
+  ): Future[User] =
+    for {
+      tweets <- Future.traverse(users)(user =>
+        service
+          .tweet(user, s"${user.id} will win!")
+          .flatMap(id => Future.traverse(followers(user))(service.like(_, id)).map(_ => id))
+      )
+      _            <- methods.unlikeAll(botUser, tweets)
+      winnerOption <- methods.topAuthor(tweets)
+      winner       <- Future.fromTry(winnerOption.fold[Try[User]](Failure(TopAuthorNotFound))(user => Success(user)))
+    } yield winner
 }
 
 object FutureCompetitionStart extends App {
-  import scala.util.Random
-  import scala.concurrent.duration.DurationInt
+  import _root_.service.TwitterServiceFuture
+  import twitter.{LocalTwitterApi, TwitterApi}
+
   import scala.concurrent.Await
+  import scala.concurrent.duration.DurationInt
+  import scala.util.Random
 
   implicit val ec: ExecutionContext = ExecutionContext.global
 

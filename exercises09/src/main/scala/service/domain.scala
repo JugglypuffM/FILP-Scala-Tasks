@@ -1,5 +1,7 @@
 package service
 
+import twitter.domain.{TweetId, TweetInfo}
+
 object domain {
   sealed trait GetTweetResponse
   object GetTweetResponse {

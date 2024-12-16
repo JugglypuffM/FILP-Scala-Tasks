@@ -52,6 +52,8 @@ lazy val exercises09 = project in file("exercises09") settings (
   libraryDependencies ++= libraries,
   scalacOptions ++= Seq("-feature", "-language:implicitConversions"),
   libraryDependencies += "org.typelevel" %% "cats-core" % "2.10.0",
+  libraryDependencies += "org.typelevel" %% "cats-effect" % "3.5.4",
+  libraryDependencies += "org.typelevel" %% "cats-effect-testing-scalatest" % "1.5.0" % Test,
   addCompilerPlugin(kindProjectorDep)
 )
 
