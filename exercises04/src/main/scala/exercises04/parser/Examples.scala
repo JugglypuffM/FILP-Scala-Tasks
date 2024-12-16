@@ -4,6 +4,21 @@ import exercises04.either.EitherCombinators._
 import Error._
 
 object Examples {
+  private val passportRegex = raw"(\d{4}) (\d{6})".r
+
+  private def getUserName(rawUser: RawUser): Option[UserName] =
+    for {
+      firstName  <- rawUser.firstName
+      secondName <- rawUser.secondName
+    } yield UserName(firstName, secondName, rawUser.thirdName)
+  private def getPassport(rawUser: RawUser): Option[Passport] = rawUser.passport match {
+    case passportRegex(s, n) =>
+      for {
+        series <- s.toLongOption
+        number <- n.toLongOption
+      } yield Passport(series, number)
+    case _ => None
+  }
 
   /**
     * если rawUser.firstName или rawUser.secondName == None, то функция должна вернуть None
@@ -13,7 +28,13 @@ object Examples {
     * rawUser.banned не "false", вернуть None
     * используйте for-comprehension
     */
-  def transformToOption(rawUser: RawUser): Option[User] = ???
+  def transformToOption(rawUser: RawUser): Option[User] =
+    for {
+      username <- getUserName(rawUser)
+      passport <- getPassport(rawUser)
+      id       <- rawUser.id.toLongOption
+      _        <- if (rawUser.banned == "false") Some() else None
+    } yield User(id, username, passport)
 
   /**
     * если rawUser.firstName или rawUser.secondName == None, то функция должна вернуть Left(InvalidName)
@@ -30,5 +51,13 @@ object Examples {
     * используйте for-comprehension
     * но для того, чтобы for-comprehension заработал надо реализовать map и flatMap в Either
     */
-  def transformToEither(rawUser: RawUser): Either[Error, User] = ???
+  def transformToEither(rawUser: RawUser): Either[Error, User] =
+    for {
+      _ <- if (rawUser.banned == "false") Right()
+      else if (rawUser.banned == "true") Left(Banned)
+      else Left(InvalidBanned)
+      id       <- Either.fromOption(rawUser.id.toLongOption)(InvalidId)
+      username <- Either.fromOption(getUserName(rawUser))(InvalidName)
+      passport <- Either.fromOption(getPassport(rawUser))(InvalidPassport)
+    } yield User(id, username, passport)
 }
