@@ -7,7 +7,7 @@ import doobie.implicits._
 import registry.domain.model.{Application, Passport, PhoneNumber, User}
 import registry.domain.service.ApplicationAlg
 
-import java.time._
+import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import scala.concurrent.duration.FiniteDuration
 
@@ -21,7 +21,6 @@ object ApplicationAlg {
 
   //TODO: сделать так, чтобы учитывалось время жизни заявки на регистрацию
   private class ApplicationAlgImpl[F[_]: MonadCancelThrow](transactor: Transactor[F]) extends ApplicationAlg[F] {
-    private val formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
 
     override def getApplicationBy(user: User): F[Option[Application.Id]] =
       for {
@@ -36,12 +35,12 @@ object ApplicationAlg {
           .map(_.headOption)
         res <- response match {
           case Some((id, expired)) =>
-            val exp = ZonedDateTime.from(formatter.parse(expired))
-            val current = ZonedDateTime.now()
-            val appId = Application.Id(id)
-            if (current.isBefore(exp))
+            val exp     = ZonedDateTime.from(DateTimeFormatter.ISO_DATE_TIME.parse(expired))
+            val current = ZonedDateTime.now
+            val appId   = Application.Id(id)
+            if (current.isBefore(exp)) {
               appId.some.pure[F]
-            else {
+            } else {
               remove(appId)
               None.pure[F]
             }
@@ -62,19 +61,18 @@ object ApplicationAlg {
           .map(_.headOption)
         res <- response match {
           case Some((passport, name, surname, patronymic, phone, expired)) =>
-            val exp = ZonedDateTime.from(formatter.parse(expired))
-            val current = ZonedDateTime.now()
-            if (current.isBefore(exp))
-              User(name, surname, patronymic, Passport.parseUnsafe(passport), PhoneNumber.parseUnsafe(phone)).some.pure[F]
-            else {
-              remove(appId)
+            val exp     = ZonedDateTime.from(DateTimeFormatter.ISO_DATE_TIME.parse(expired))
+            val current = ZonedDateTime.now
+            if (current.isBefore(exp)) {
+              User(name, surname, patronymic, Passport.parseUnsafe(passport), PhoneNumber.parseUnsafe(phone)).some
+                .pure[F]
+            } else {
               None.pure[F]
             }
           case None => None.pure[F]
         }
 
       } yield res
-
 
     override def persist(appId: Application.Id, user: User, ttl: FiniteDuration): F[Unit] = sql"""
       INSERT INTO application (id, passport, name, surname, patronymic, phone, expired) VALUES (
@@ -84,7 +82,7 @@ object ApplicationAlg {
         ${user.surname},
         ${user.patronymic},
         ${user.phoneNumber.country + user.phoneNumber.code + user.phoneNumber.number},
-        ${java.time.ZonedDateTime.now().plusSeconds(ttl.toSeconds).format(formatter)}
+        ${ZonedDateTime.now().plusSeconds(ttl.toSeconds).format(DateTimeFormatter.ISO_DATE_TIME)}
       )
     """.update.run.transact(transactor).as(())
 
@@ -97,7 +95,7 @@ object ApplicationAlg {
   private val createTable = sql"""
      CREATE TABLE IF NOT EXISTS application (
        id TEXT NOT NULL UNIQUE,
-       passport TEXT NOT NULL,
+       passport TEXT NOT NULL UNIQUE,
        name TEXT NOT NULL,
        surname TEXT NOT NULL,
        patronymic TEXT,

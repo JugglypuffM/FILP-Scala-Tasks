@@ -16,7 +16,7 @@ class SignUpTest extends AsyncFreeSpec with AsyncIOSpec with Matchers with Async
 
   trait Stand {
     val registry: Registry[IO] = mock[Registry[IO]]
-    val checkIn: SignUp[IO] = new SignUp[IO](registry)
+    val checkIn: SignUp[IO]    = new SignUp[IO](registry)
   }
 
   def stand: Stand = new Stand {}
@@ -29,11 +29,11 @@ class SignUpTest extends AsyncFreeSpec with AsyncIOSpec with Matchers with Async
     )
   )
   val entity: Map[String, String] = Map(
-    "name" -> "Иван",
-    "surname" -> "Иванов",
-    "patronymic" -> "Иванович",
-    "passport" -> "1234567890",
-    "phoneNumber" -> "+79993332222",
+    "name"        -> "Иван",
+    "surname"     -> "Иванов",
+    "patronymic"  -> "Иванович",
+    "passport"    -> "1234567890",
+    "phoneNumber" -> "+79993332222"
   )
 
   "CheckIn" - {
@@ -45,7 +45,7 @@ class SignUpTest extends AsyncFreeSpec with AsyncIOSpec with Matchers with Async
         (registry.signUp _).expects(*).returning(().pure[IO])
 
         for {
-          r <- checkIn.route.orNotFound.run(request.withEntity(entity.asJson.toString))
+          r    <- checkIn.route.orNotFound.run(request.withEntity(entity.asJson.toString))
           body <- r.body.compile.toList.map(_.toArray).map(x => new String(x, "UTF-8"))
         } yield {
           r.status shouldBe Status.Ok
@@ -58,12 +58,12 @@ class SignUpTest extends AsyncFreeSpec with AsyncIOSpec with Matchers with Async
         import s._
 
         for {
-          r <- checkIn.route.orNotFound.run(request.withEntity(Map("kek" -> "cheburek").asJson.toString))
+          r    <- checkIn.route.orNotFound.run(request.withEntity(Map("kek" -> "cheburek").asJson.toString))
           body <- r.body.compile.toList.map(_.toArray).map(x => new String(x, "UTF-8"))
         } yield {
           r.status shouldBe Status.BadRequest
-          body should include ("Invalid message body: Could not decode JSON")
-          body should include (""""kek" : "cheburek"""")
+          body should include("Invalid message body: Could not decode JSON")
+          body should include(""""kek" : "cheburek"""")
         }
       }
       "return BadRequest when param of request is invalid" in {
@@ -71,7 +71,7 @@ class SignUpTest extends AsyncFreeSpec with AsyncIOSpec with Matchers with Async
         import s._
 
         for {
-          r <- checkIn.route.orNotFound.run(request.withEntity(entity.map(x => x._1 -> (x._2 + "1")).asJson.toString()))
+          r    <- checkIn.route.orNotFound.run(request.withEntity(entity.map(x => x._1 -> (x._2 + "1")).asJson.toString()))
           body <- r.body.compile.toList.map(_.toArray).map(x => new String(x, "UTF-8"))
         } yield {
           r.status shouldBe Status.BadRequest
@@ -92,7 +92,7 @@ class SignUpTest extends AsyncFreeSpec with AsyncIOSpec with Matchers with Async
         (registry.signUp _).expects(*).returning(IO.raiseError(Registry.Error.UserApplicationAlreadyExists))
 
         for {
-          r <- checkIn.route.orNotFound.run(request.withEntity(entity.asJson.toString))
+          r    <- checkIn.route.orNotFound.run(request.withEntity(entity.asJson.toString))
           body <- r.body.compile.toList.map(_.toArray).map(x => new String(x, "UTF-8"))
         } yield {
           r.status shouldBe Status.BadRequest
@@ -107,7 +107,7 @@ class SignUpTest extends AsyncFreeSpec with AsyncIOSpec with Matchers with Async
         (registry.signUp _).expects(*).returning(IO.raiseError(Registry.Error.UserAlreadyExists))
 
         for {
-          r <- checkIn.route.orNotFound.run(request.withEntity(entity.asJson.toString))
+          r    <- checkIn.route.orNotFound.run(request.withEntity(entity.asJson.toString))
           body <- r.body.compile.toList.map(_.toArray).map(x => new String(x, "UTF-8"))
         } yield {
           r.status shouldBe Status.BadRequest
@@ -122,7 +122,7 @@ class SignUpTest extends AsyncFreeSpec with AsyncIOSpec with Matchers with Async
         (registry.signUp _).expects(*).returning(IO.raiseError(new Exception("FAIL!!1!")))
 
         for {
-          r <- checkIn.route.orNotFound.run(request.withEntity(entity.asJson.toString))
+          r    <- checkIn.route.orNotFound.run(request.withEntity(entity.asJson.toString))
           body <- r.body.compile.toList.map(_.toArray).map(x => new String(x, "UTF-8"))
         } yield {
           r.status shouldBe Status.InternalServerError
